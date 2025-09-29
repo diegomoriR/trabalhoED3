@@ -1,0 +1,22 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "header_pessoa.h"
+
+typedef struct _registroPessoa{
+    char removido;
+    int tamanhoRegistro;
+    int idPessoa;
+    int idadePessoa;
+    int tamanhoNomePessoa;
+    char nomePessoa[];
+    int tamanhoNomeUsuario;
+    char nomeUsuario[];
+}pessoa;
+
+void add_pessoa(int idPessoa, int idadePessoa, char nomePessoa[]){
+
+}
+
+void remove_pessoa(int idPessoa, int idadePessoa, char nomePessoa[]){
+    
+}
