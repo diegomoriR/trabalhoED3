@@ -1,9 +1,0 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "header_indice.h"
-
-typedef struct{
-    int idPessoa;
-    int offSet;
-}
-
