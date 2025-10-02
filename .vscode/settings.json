@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "funcionalidade1": "c",
+        "funcionalidade2": "c"
+    },
+    "C_Cpp.errorSquiggles": "enabled"
+}

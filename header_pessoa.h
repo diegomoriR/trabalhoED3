@@ -19,7 +19,7 @@ typedef struct _registroPessoa{
     char nomeUsuario[];
 }pessoa;
 
-#define VERIFICAR_ARQUIVO(fd) (if(fd == NULL){printf("Falha no processamento do arquivo.\n");})
+#define VERIFICAR_ARQUIVO(fd) (if(fd == NULL){printf("Falha no processamento do arquivo.\n");return;})
 #define TAMANHO_INDICE 12
 #define INICIO_ARQUIVO(fd) (fseek(fd, 0 , SEEK_SET);)
 #define TAMANHO_LINHA 1024
