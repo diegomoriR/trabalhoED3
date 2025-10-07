@@ -30,11 +30,9 @@ typedef struct _indice{
 
 
 
-#define VERIFICAR_ARQUIVO(fd) (if(fd == NULL){printf("Falha no processamento do arquivo.\n");})
 #define TAMANHO_INDICE 12
-#define INICIO_ARQUIVO(fd) (fseek(fd, 0 , SEEK_SET);)
+#define INICIO_ARQUIVO(fd) fseek(fd, 0 , SEEK_SET)
 #define TAMANHO_LINHA 1024
-#define SEPARA_LINHA(linha,delimtitador) (str1 = strtok(linha, delimitador);)
 
 void CREATE_INDEX(char *arquivoIndicePrimario);
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario);
