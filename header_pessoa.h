@@ -14,14 +14,13 @@ typedef struct _pessoa{
     int idPessoa;
     int idadePessoa;
     int tamanhoNomePessoa;
-    char nomePessoa[];
     int tamanhoNomeUsuario;
-    char nomeUsuario[];
+    char *nomePessoa;
+    char *nomeUsuario;
 }pessoa;
 
 typedef struct _headerIndice{
     char status;
-    char lixo[11] = {$,$,$,$,$,$,$,$,$,$,$};
 }headerIndice;
 
 typedef struct _indice{
@@ -36,6 +35,9 @@ typedef struct _indice{
 #define INICIO_ARQUIVO(fd) (fseek(fd, 0 , SEEK_SET);)
 #define TAMANHO_LINHA 1024
 #define SEPARA_LINHA(linha,delimtitador) (str1 = strtok(linha, delimitador);)
+
+void CREATE_INDEX(char *arquivoIndicePrimario);
+void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario);
 
 #endif
 
