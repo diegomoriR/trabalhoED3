@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "header_pessoa.h"
-#include "header_indice.h"
+#include "utilidades.h"
 
 //funcionalidade 1 (CREATE INDEX)
-void CREATE_INDEX(FILE *fd){
-    FILE *fd = fopen("arquivoIndicePrimario.bin", "wb"); //abrindo o arquivo para a escrita binaria
+void CREATE_INDEX(char *arquivoIndicePrimario){
+    FILE *fd = fopen(arquivoIndicePrimario, "wb"); //abrindo o arquivo para a escrita binaria
     VERIFICAR_ARQUIVO(fd); // verificando se o arquivo foi aberto corretamente
     headerIndice h;
     h.status = '0'; // status inconsistente
@@ -18,4 +18,5 @@ void CREATE_INDEX(FILE *fd){
     INICIO_ARQUIVO(fd) // cursor do arquivo para o inicio
     fwrite(&h.status, sizeof(char), 1, fd);
     fclose(fd); //fechando arquivo
+    binarioNaTela(arquivoIndicePrimario);
 }
