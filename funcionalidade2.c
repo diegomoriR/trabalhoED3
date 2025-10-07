@@ -4,6 +4,7 @@
 #include "header_pessoa.h"
 #include "utilidades.h"
 
+
 //funcionalidade 2 (CREATE TABLE)
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario){
     FILE *fdin = fopen(arquivoEntrada, "r"); // abrindo o arquivo para ler os dados
@@ -15,14 +16,14 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
 
     //criar cabecalho do arquivo de dados pessoa e status inconsistente
     header hp;
-    hp.status = '0' //status incosistente
+    hp.status = '0'; //status incosistente
     fwrite(&hp.status, sizeof(char), 1, fdout);
     hp.quantidadePessoas = 0;
     hp.quantidadeRemovidos = 0;  //iniciando o cabecalho
     hp.Offset = 0;
-    fwrite(hp.quantidadePessoas, sizeof(int), 1, fdout);
-    fwrite(hp.quantidadeRemovidos, sizeof(int), 1, fdout);
-    fwrite(hp.Offset, sizeof(long), 1, fdout);
+    fwrite(&hp.quantidadePessoas, sizeof(int), 1, fdout);
+    fwrite(&hp.quantidadeRemovidos, sizeof(int), 1, fdout);
+    fwrite(&hp.Offset, sizeof(long), 1, fdout);
     //hp.status = '1' //status consistente
     //INICIO_ARQUIVO(fdout) // cursor do arquivo para o inicio
     //fwrite(&hp.status, sizeof(char), 1, fdout);
@@ -42,7 +43,7 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     char linha[TAMANHO_LINHA]; // linha para ler os dados
     fgets(linha, TAMANHO_LINHA, fdin);//pula linha do arquivo csv
 
-    while(fgets(linha, TAMANHO_LINHA, fdin) != EOF){ // ler as linhas ate o final do arquivo csv
+    while(fgets(linha, TAMANHO_LINHA, fdin) != NULL){ // ler as linhas ate o final do arquivo csv
         char *str1;
         int tamNomePessoa;
         int tamNomeUsuario;
@@ -67,7 +68,7 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
         //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
     //idade Pessoa
         str1 = strtok(NULL, ",");
-        if(strcpm(str1, NULL) != 0){
+        if(strcmp(str1, NULL) != 0){
             p.idadePessoa = atoi(str1);
         }else{
             p.idadePessoa = -1;
@@ -103,9 +104,9 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     //escrevendo o arquivo do indice
         indice i;
         i.idPessoa = p.idPessoa;
-        i.Offset = Offset;
+        i.offSet = Offset;
         fwrite(&i.idPessoa, sizeof(int), 1, fdh);
-        fwrite(&i.Offset, sizeof(long), 1, fdh);
+        fwrite(&i.offSet, sizeof(long), 1, fdh);
         
     } 
     //atualizando cabecalho do arquivo de dados binario
