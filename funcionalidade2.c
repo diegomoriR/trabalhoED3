@@ -8,11 +8,17 @@
 //funcionalidade 2 (CREATE TABLE)
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario){
     FILE *fdin = fopen(arquivoEntrada, "r"); // abrindo o arquivo para ler os dados
-    VERIFICAR_ARQUIVO(fdin);
+    if(fdin == NULL){
+        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
+    } 
     FILE *fdout = fopen(arquivoSaida, "wb"); // abrindo o arquivo para a escrita binaria no arquivo de dados
-    VERIFICAR_ARQUIVO(fdout);
+    if(fdout == NULL){
+        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
+    } 
     FILE *fdh = fopen(arquivoIndicePrimario, "wb"); // abrindo o arquivo para a escrita binaria no indice
-    VERIFICAR_ARQUIVO(fdh)
+    if(fdh == NULL){
+        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
+    } 
 
     //criar cabecalho do arquivo de dados pessoa e status inconsistente
     header hp;
