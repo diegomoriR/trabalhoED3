@@ -2,15 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include "header_pessoa.h"
-#include "header_indice.h"
+#include "utilidades.h"
 
 //funcionalidade 2 (CREATE TABLE)
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario){
-    FILE *fdin = fopen("arquivoEntrada.csv", "r"); // abrindo o arquivo para ler os dados
+    FILE *fdin = fopen(arquivoEntrada, "r"); // abrindo o arquivo para ler os dados
     VERIFICAR_ARQUIVO(fdin);
-    FILE *fdout = fopen("arquivoSaida.bin", "wb"); // abrindo o arquivo para a escrita binaria no arquivo de dados
+    FILE *fdout = fopen(arquivoSaida, "wb"); // abrindo o arquivo para a escrita binaria no arquivo de dados
     VERIFICAR_ARQUIVO(fdout);
-    FILE *fdh = fopen("arquivoIndicePrimario.bin", "wb"); // abrindo o arquivo para a escrita binaria no indice
+    FILE *fdh = fopen(arquivoIndicePrimario, "wb"); // abrindo o arquivo para a escrita binaria no indice
     VERIFICAR_ARQUIVO(fdh)
 
     //criar cabecalho do arquivo de dados pessoa e status inconsistente
@@ -49,21 +49,39 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     
     //id Pessoa    
         str1 = strtok(linha, ",");
-        p.idPessoa = atoi(str1);
+        if(strcmp(str1, NULL) != 0){
+            p.idPessoa = atoi(str1);
+        }else{
+            p.idPessoa = -1;
+        }
     //nome Pessoa
         str1 = strtok(NULL, ",");
-        strcpy(p.nomePessoa, str1);
-        //calculando tamanho do campo nome Pessoa
-        tamNomePessoa = strlen(p.nomePessoa);
+        if(strcmp(str1, NULL) != 0){
+            strcpy(p.nomePessoa, str1);
+            //calculando tamanho do campo nome Pessoa
+            tamNomePessoa = strlen(p.nomePessoa);
+        }else{
+            p.nomePessoa = NULL;
+            tamNomePessoa = 0;
+        }
         //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
     //idade Pessoa
         str1 = strtok(NULL, ",");
-        p.idadePessoa = atoi(str1);
+        if(strcpm(str1, NULL) != 0){
+            p.idadePessoa = atoi(str1);
+        }else{
+            p.idadePessoa = -1;
+        }
     //nome Usuario
         str1 = strtok(NULL, ",");
-        strcpy(p.nomeUsuario, str1);
-        //calculando tamanho do campo nome Usuario
-        tamNomeUsuario = strlen(p.nomeUsuario);
+        if(strcmp(str1, NULL) != 0){
+            strcpy(p.nomeUsuario, str1);
+            //calculando tamanho do campo nome Usuario
+            tamNomeUsuario = strlen(p.nomeUsuario);
+        }else{
+            p.nomeUsuario = NULL;
+            tamNomeUsuario = 0;
+        }
     //calculando tamanho do registro;
         int tamReg = 21 + tamNomePessoa + tamNomeUsuario;
     //escrevendo no arquivo binario os dados lidos
@@ -73,9 +91,13 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
         fwrite(&p.idPessoa, sizeof(int), 1, fdout);
         fwrite(&p.idadePessoa, sizeof(int), 1, fdout);
         fwrite(&tamNomePessoa, sizeof(int), 1, fdout);
+        if(p.nomePessoa != NULL){
         fwrite(&p.nomePessoa, sizeof(tamNomePessoa), 1, fdout);
+        }
         fwrite(&tamNomeUsuario, sizeof(int), 1, fdout);
+        if(p.nomeUsuario != NULL){
         fwrite(&p.nomeUsuario, sizeof(tamNomeUsuario), 1, fdout);
+        }
     //mais uma pessoa inserida
         hp.quantidadePessoas++;
     //escrevendo o arquivo do indice
@@ -100,10 +122,11 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     hi.status = '1'; //status consistente
     fwrite(&hi.status, sizeof(char), 1, fdh);
     
-
-
     //fechar os arquivos
     fclose(fdin);
     fclose(fdout);
     fclose(fdh);
+
+    binarioNaTela(arquivoSaida);
+    binarioNaTela(arquivoIndicePrimario);
 }
