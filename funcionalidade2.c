@@ -10,15 +10,15 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     FILE *fdin = fopen(arquivoEntrada, "r"); // abrindo o arquivo para ler os dados
     if(fdin == NULL){
         printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
-    } 
+    }
     FILE *fdout = fopen(arquivoSaida, "wb"); // abrindo o arquivo para a escrita binaria no arquivo de dados
     if(fdout == NULL){
         printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
-    } 
+    }
     FILE *fdh = fopen(arquivoIndicePrimario, "wb"); // abrindo o arquivo para a escrita binaria no indice
     if(fdh == NULL){
         printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
-    } 
+    }
 
     //criar cabecalho do arquivo de dados pessoa e status inconsistente
     header hp;
@@ -45,50 +45,59 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
 
     //Ler os dados do arquivo csv
     //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
-    pessoa p; 
+    pessoa p;
     char linha[TAMANHO_LINHA]; // linha para ler os dados
     fgets(linha, TAMANHO_LINHA, fdin);//pula linha do arquivo csv
-
     while(fgets(linha, TAMANHO_LINHA, fdin) != NULL){ // ler as linhas ate o final do arquivo csv
         char *str1;
         int tamNomePessoa;
         int tamNomeUsuario;
-    
-    //id Pessoa    
+
+    //id Pessoa
         str1 = strtok(linha, ",");
-        if(strcmp(str1, NULL) != 0){
+        if(str1 != NULL){
             p.idPessoa = atoi(str1);
         }else{
             p.idPessoa = -1;
         }
+        printf("%d\n",p.idPessoa);
     //nome Pessoa
         str1 = strtok(NULL, ",");
-        if(strcmp(str1, NULL) != 0){
-            strcpy(p.nomePessoa, str1);
+        if(str1 != NULL){
+            char nomePessoa[100];
+            strcpy(nomePessoa, str1);
+            p.nomePessoa = strdup(nomePessoa);
             //calculando tamanho do campo nome Pessoa
             tamNomePessoa = strlen(p.nomePessoa);
         }else{
             p.nomePessoa = NULL;
             tamNomePessoa = 0;
         }
+        printf("%s\n", p.nomePessoa);
+        printf("%d\n",tamNomePessoa);
         //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
     //idade Pessoa
         str1 = strtok(NULL, ",");
-        if(strcmp(str1, NULL) != 0){
+        if(str1 != NULL){
             p.idadePessoa = atoi(str1);
         }else{
             p.idadePessoa = -1;
         }
+        printf("%d\n", p.idadePessoa);
     //nome Usuario
         str1 = strtok(NULL, ",");
-        if(strcmp(str1, NULL) != 0){
-            strcpy(p.nomeUsuario, str1);
+        if(str1 != NULL){
+            char nomeUsuario[100];
+            strcpy(nomeUsuario, str1);
+            p.nomeUsuario = strdup(nomeUsuario);
             //calculando tamanho do campo nome Usuario
-            tamNomeUsuario = strlen(p.nomeUsuario);
+            tamNomeUsuario = strlen(p.nomeUsuario) - 1;
         }else{
             p.nomeUsuario = NULL;
             tamNomeUsuario = 0;
         }
+        printf("%d\n",tamNomeUsuario);
+        printf("%s\n", p.nomeUsuario);
     //calculando tamanho do registro;
         int tamReg = 21 + tamNomePessoa + tamNomeUsuario;
     //escrevendo no arquivo binario os dados lidos
@@ -110,11 +119,11 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     //escrevendo o arquivo do indice
         indice i;
         i.idPessoa = p.idPessoa;
-        i.offSet = Offset;
+        i.Offset = Offset;
         fwrite(&i.idPessoa, sizeof(int), 1, fdh);
-        fwrite(&i.offSet, sizeof(long), 1, fdh);
-        
-    } 
+        fwrite(&i.Offset, sizeof(long), 1, fdh);
+
+    }
     //atualizando cabecalho do arquivo de dados binario
     INICIO_ARQUIVO(fdout);
     hp.status = '1'; //status consistente
@@ -128,12 +137,12 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     INICIO_ARQUIVO(fdh);
     hi.status = '1'; //status consistente
     fwrite(&hi.status, sizeof(char), 1, fdh);
-    
+
     //fechar os arquivos
     fclose(fdin);
     fclose(fdout);
     fclose(fdh);
 
-    binarioNaTela(arquivoSaida);
-    binarioNaTela(arquivoIndicePrimario);
+    //binarioNaTela(arquivoSaida);
+    //binarioNaTela(arquivoIndicePrimario);
 }
