@@ -140,7 +140,10 @@ char *mystrsep(char **str, char const *delim) {
         indice i;
         i.idPessoa = p.idPessoa;
         i.Offset = Offset;
+        fseek(fdh, 12, SEEK_SET);
         //ordenar os indices
+        //printf("id:%d\n",p.idPessoa);
+        //printf("offset:%ld\n",i.Offset);
         fwrite(&i.idPessoa, sizeof(int), 1, fdh);
         fwrite(&i.Offset, sizeof(long), 1, fdh);
 
