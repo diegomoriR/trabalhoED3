@@ -2,78 +2,173 @@
 #include <stdlib.h>
 #include <string.h>
 #include "header_pessoa.h"
+//#include "utilidades.h"
 
 
-//funcionalidade 3 (SELECT)
-void SELECT(char *arquivoEntrada, char *arquivoIndicePrimario){
-
-    FILE *fdh = fopen(arquivoIndicePrimario, "rb");//abrindo o arquivo de indice para a leitura binaria
+//funcionalidade 2 (CREATE TABLE)
+void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario){
+    FILE *fdin = fopen(arquivoEntrada, "r"); // abrindo o arquivo para ler os dados
+    if(fdin == NULL){
+        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
+    }
+    FILE *fdout = fopen(arquivoSaida, "wb"); // abrindo o arquivo para a escrita binaria no arquivo de dados
+    if(fdout == NULL){
+        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
+    }
+    FILE *fdh = fopen(arquivoIndicePrimario, "wb"); // abrindo o arquivo para a escrita binaria no indice
     if(fdh == NULL){
-        printf("Falha no processamento do arquivo\n");//verificando se o arquivo foi aberto corretamente
+        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
     }
 
-    FILE *fd = fopen(arquivoIndicePrimario, "rb"); //abrindo o arquivo de dados pessoa para a leitura binaria
-    if(fd == NULL){
-        printf("Falha no processamento do arquivo\n");// verificando se o arquivo foi aberto corretamente
-    }
-    headerIndice hi;
-    //verificar o status do indice para ver se ta consistente
-    if(hi.status == '0'){
-        printf("Falha no processamento do arquivo\n");
-        return;
-    }
 
-    fseek(fdh, 12, SEEK_SET);//la o lixo do header do indice
-
-    header h;
-    fseek(fd, 1, SEEK_SET); // cursor para o inicio do registro de cabecalho
-    fread(&h.quantidadePessoas, sizeof(int), 1, fd);
-    fread(&h.quantidadeRemovidos,sizeof(int), 1, fd);
-    fread(&h.Offset,sizeof(long), 1, fd);
-    int qtdePessoas = h.quantidadePessoas;
-    int qtdeRemovidos = h.quantidadeRemovidos;
-    long Offset = h.Offset;
-
-    //ler todos os dados das pessoas
-    indice index;
-    pessoa p;
-    for(int i = 0; i < (qtdePessoas-qtdeRemovidos) + 1;i++){
-        fread(&index.idPessoa, sizeof(int), 1, fdh);//leitura o id pessoa no indice primario
-        fread(&index.Offset, sizeof(long), 1, fdh);//leitura do byteoffset no indice primario
-        fseek(fd, index.Offset, SEEK_SET); // pulo no arquivo de dados para o byteoffset do indice primario
-        fread(&p.removido,sizeof(char), 1, fd);
-        if(p.removido == '0'){ //registro nao esta marcado como removido
-            fread(&p.tamanhoRegistro, sizeof(int), 1, fd);
-            fread(&p.idPessoa, sizeof(int), 1, fd);
-            fread(&p.idadePessoa, sizeof(int), 1, fd);
-            fread(&p.tamanhoNomePessoa, sizeof(int), 1, fd);
-            fread(&p.nomePessoa, sizeof(char), p.tamanhoNomePessoa, fd);
-            fread(&p.tamanhoNomeUsuario,sizeof(int), 1, fd);
-            fread(&p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
-            //idPessoa
-            if(p.idPessoa != -1){
-                printf("Dados da pessoa de codigo %d\n", p.idPessoa);
-            }else{
-                printf("Dados da pessoa de codigo -\n");
-            }
-            //nomePessoa
-            if(p.nomePessoa != NULL){
-                printf("Nome: %s\n", p.nomePessoa);
-            }else{
-                printf("Nome: - \n");
-            }
-            //idadePessoa
-            if(p.idadePessoa != -1){
-                printf("Idade: %d\n", p.idadePessoa);
-            }else{
-                printf("Idade: -\n");
-            }
-            //usuarioPessoa
-            if(p.nomeUsuario != NULL){
-                printf("Usuario: %s\n", p.nomeUsuario);
-            }else{
-                printf("Usuario: - \n");
+char *mystrsep(char **str, char const *delim) {
+    char *inicio = *str;
+    char *p;
+    if (inicio == NULL)
+        return NULL;
+    for (p = inicio; *p != '\0'; p++) {
+        const char *d;
+        for (d = delim; *d != '\0'; d++) {
+            if (*p == *d) {
+                *p = '\0';
+                *str = p + 1;
+                return inicio;
             }
         }
     }
+    *str = NULL;
+    return inicio;
+}
+
+    //criar cabecalho do arquivo de dados pessoa e status inconsistente
+    header hp;
+    hp.status = '0'; //status incosistente
+    fwrite(&hp.status, sizeof(char), 1, fdout);
+    hp.quantidadePessoas = 0;
+    hp.quantidadeRemovidos = 0;  //iniciando o cabecalho
+    hp.Offset = 0;
+    fwrite(&hp.quantidadePessoas, sizeof(int), 1, fdout);
+    fwrite(&hp.quantidadeRemovidos, sizeof(int), 1, fdout);
+    fwrite(&hp.Offset, sizeof(long), 1, fdout);
+
+    //criar cabecalho do arquivo de indice e status inconsistente
+    headerIndice hi;
+    INICIO_ARQUIVO(fdh);
+    fread(&hi.status, sizeof(char), 1, fdh);
+    hi.status = '0'; //status incosistente
+    INICIO_ARQUIVO(fdh);
+    fwrite(&hi.status, sizeof(char), 1, fdh);
+    fseek(fdh, 11, SEEK_SET);
+
+    //Ler os dados do arquivo csv
+    //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
+    pessoa p;
+    char linha[TAMANHO_LINHA]; // linha para ler os dados
+    fgets(linha, TAMANHO_LINHA, fdin);//pula linha do arquivo csv
+    while(fgets(linha, TAMANHO_LINHA, fdin) != NULL){ // ler as linhas ate o final do arquivo csv
+        char *str1;
+        char *pointer = linha;
+        int tamNomePessoa;
+        int tamNomeUsuario;
+
+    //id Pessoa
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL){
+            p.idPessoa = atoi(str1);
+        }else{
+            p.idPessoa = -1;
+        }
+        //printf("id:%d\n",p.idPessoa);
+    //nome Pessoa
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL){
+            char nomePessoa[100];
+            strcpy(nomePessoa, str1);
+            p.nomePessoa = strdup(nomePessoa);
+            //calculando tamanho do campo nome Pessoa
+            tamNomePessoa = strlen(p.nomePessoa);
+        }else{
+            p.nomePessoa = NULL;
+            tamNomePessoa = 0;
+        }
+        //printf("nome:%s\n", p.nomePessoa);
+        //printf("tamanho nome:%d\n",tamNomePessoa);
+        //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
+    //idade Pessoa
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL && strcmp(str1,"")!=0){
+            p.idadePessoa = atoi(str1);
+        }else{
+            p.idadePessoa = -1;
+        }
+        //printf("idade:%d\n", p.idadePessoa);
+    //nome Usuario
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL){
+            char nomeUsuario[100];
+            strcpy(nomeUsuario, str1);
+            p.nomeUsuario = strdup(nomeUsuario);
+            //calculando tamanho do campo nome Usuario
+            tamNomeUsuario = strlen(p.nomeUsuario) - 1;
+        }else{
+            p.nomeUsuario = NULL;
+            tamNomeUsuario = 0;
+        }
+        //printf("tamanho usuario:%d\n",tamNomeUsuario);
+        //printf("usuario: %s\n", p.nomeUsuario);
+
+    //calculando tamanho do registro;
+        int tamReg = 21 + tamNomePessoa + tamNomeUsuario;
+        p.removido = '0';
+    //escrevendo no arquivo binario os dados lidos
+        long Offset = ftell(fdout);
+        fwrite(&p.removido, sizeof(char), 1, fdout);
+        fwrite(&tamReg, sizeof(int), 1, fdout);
+        fwrite(&p.idPessoa, sizeof(int), 1, fdout);
+        fwrite(&p.idadePessoa, sizeof(int), 1, fdout);
+        fwrite(&tamNomePessoa, sizeof(int), 1, fdout);
+        if(p.nomePessoa != NULL){
+        fwrite(&p.nomePessoa, sizeof(tamNomePessoa), 1, fdout);
+        }
+        fwrite(&tamNomeUsuario, sizeof(int), 1, fdout);
+        if(p.nomeUsuario != NULL){
+        fwrite(&p.nomeUsuario, sizeof(tamNomeUsuario), 1, fdout);
+        }
+    //mais uma pessoa inserida
+        hp.quantidadePessoas++;
+    //escrevendo o arquivo do indice
+        indice i;
+        i.idPessoa = p.idPessoa;
+        i.Offset = Offset;
+        fseek(fdh, 12, SEEK_SET);
+        //ordenar os indices
+        //printf("id:%d\n",p.idPessoa);
+        //printf("offset:%ld\n",i.Offset);
+        fwrite(&i.idPessoa, sizeof(int), 1, fdh);
+        fwrite(&i.Offset, sizeof(long), 1, fdh);
+
+    }
+    //atualizando cabecalho do arquivo de dados binario
+    INICIO_ARQUIVO(fdout);
+    hp.status = '1'; //status consistente
+    fwrite(&hp.status, sizeof(char), 1, fdout);
+    fwrite(&hp.quantidadePessoas, sizeof(int), 1, fdout);
+    fwrite(&hp.quantidadeRemovidos, sizeof(int), 1, fdout);
+    fseek(fdout, 0, SEEK_END);
+    hp.Offset = ftell(fdout);
+    fseek(fdout, 9, SEEK_SET);
+    fwrite(&hp.Offset, sizeof(long), 1, fdout);
+
+    //atualizando cabecalho do arquivo de indice
+    INICIO_ARQUIVO(fdh);
+    hi.status = '1'; //status consistente
+    fwrite(&hi.status, sizeof(char), 1, fdh);
+
+    //fechar os arquivos
+    fclose(fdin);
+    fclose(fdout);
+    fclose(fdh);
+
+    binarioNaTela(arquivoSaida);
+    binarioNaTela(arquivoIndicePrimario);
 }
