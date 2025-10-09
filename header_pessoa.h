@@ -25,7 +25,7 @@ typedef struct _headerIndice{
 
 typedef struct _indice{
     int idPessoa;
-    long offSet;
+    long Offset;
 }indice;
 
 
@@ -38,4 +38,5 @@ void CREATE_INDEX(char *arquivoIndicePrimario);
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario);
 
 #endif
+
 
