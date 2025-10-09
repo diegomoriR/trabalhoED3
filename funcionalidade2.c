@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "header_pessoa.h"
-#include "utilidades.h"
+//#include "utilidades.h"
 
 
 //funcionalidade 2 (CREATE TABLE)
@@ -19,6 +19,26 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     if(fdh == NULL){
         printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
     }
+
+
+char *mystrsep(char **str, char const *delim) {
+    char *inicio = *str;
+    char *p;
+    if (inicio == NULL)
+        return NULL;
+    for (p = inicio; *p != '\0'; p++) {
+        const char *d;
+        for (d = delim; *d != '\0'; d++) {
+            if (*p == *d) {
+                *p = '\0';
+                *str = p + 1;
+                return inicio;
+            }
+        }
+    }
+    *str = NULL;
+    return inicio;
+}
 
     //criar cabecalho do arquivo de dados pessoa e status inconsistente
     header hp;
@@ -47,19 +67,20 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     fgets(linha, TAMANHO_LINHA, fdin);//pula linha do arquivo csv
     while(fgets(linha, TAMANHO_LINHA, fdin) != NULL){ // ler as linhas ate o final do arquivo csv
         char *str1;
+        char *pointer = linha;
         int tamNomePessoa;
         int tamNomeUsuario;
 
     //id Pessoa
-        str1 = strtok(linha, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 != NULL){
             p.idPessoa = atoi(str1);
         }else{
             p.idPessoa = -1;
         }
-        printf("%d\n",p.idPessoa);
+        //printf("id:%d\n",p.idPessoa);
     //nome Pessoa
-        str1 = strtok(NULL, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 != NULL){
             char nomePessoa[100];
             strcpy(nomePessoa, str1);
@@ -70,19 +91,19 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
             p.nomePessoa = NULL;
             tamNomePessoa = 0;
         }
-        printf("%s\n", p.nomePessoa);
-        printf("%d\n",tamNomePessoa);
+        //printf("nome:%s\n", p.nomePessoa);
+        //printf("tamanho nome:%d\n",tamNomePessoa);
         //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
     //idade Pessoa
-        str1 = strtok(NULL, ",");
-        if(str1 != NULL){
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL && strcmp(str1,"")!=0){
             p.idadePessoa = atoi(str1);
         }else{
             p.idadePessoa = -1;
         }
-        printf("%d\n", p.idadePessoa);
+        //printf("idade:%d\n", p.idadePessoa);
     //nome Usuario
-        str1 = strtok(NULL, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 != NULL){
             char nomeUsuario[100];
             strcpy(nomeUsuario, str1);
@@ -93,10 +114,12 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
             p.nomeUsuario = NULL;
             tamNomeUsuario = 0;
         }
-        printf("%d\n",tamNomeUsuario);
-        printf("%s\n", p.nomeUsuario);
+        //printf("tamanho usuario:%d\n",tamNomeUsuario);
+        //printf("usuario: %s\n", p.nomeUsuario);
+
     //calculando tamanho do registro;
         int tamReg = 21 + tamNomePessoa + tamNomeUsuario;
+        p.removido = '0';
     //escrevendo no arquivo binario os dados lidos
         long Offset = ftell(fdout);
         fwrite(&p.removido, sizeof(char), 1, fdout);
@@ -128,7 +151,9 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     fwrite(&hp.status, sizeof(char), 1, fdout);
     fwrite(&hp.quantidadePessoas, sizeof(int), 1, fdout);
     fwrite(&hp.quantidadeRemovidos, sizeof(int), 1, fdout);
+    fseek(fdout, 0, SEEK_END);
     hp.Offset = ftell(fdout);
+    fseek(fdout, 9, SEEK_SET);
     fwrite(&hp.Offset, sizeof(long), 1, fdout);
 
     //atualizando cabecalho do arquivo de indice
@@ -141,6 +166,6 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     fclose(fdout);
     fclose(fdh);
 
-    //binarioNaTela(arquivoSaida);
-    //binarioNaTela(arquivoIndicePrimario);
+    binarioNaTela(arquivoSaida);
+    binarioNaTela(arquivoIndicePrimario);
 }
