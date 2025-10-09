@@ -26,25 +26,26 @@ int id, idade, TAM_nPessoa, TAM_nUsuario;
 
 
     for(int i = 0; i < qtdPessoas; i++){
-        fscanf(arquivoEntrada,"%c", rem);
-        fscanf(arquivoEntrada,"%d", TamReg);
+        
+        fread(rem,sizeof(char),1, arquivoEntrada);
+        fread(&tamReg,sizeof(int),1, arquivoEntrada);
         if(rem==0){
-        fscanf(arquivoEntrada,"%d", &id);
+        fread(&id,sizeof(int),1,arquivoEntrada);
         printf("Dados da pessoa do código %d\n",id);
-        fscanf(arquivoEntrada,"%d",&idade);
-        fscanf(arquivoEntrada,"%d",&TAM_nPessoa);
+        fread(&idade,sizeof(int),1,arquivoEntrada);
+        fread(&TAM_nPessoa,sizeof(int),1,arquivoEntrada);
         printf("Nome: ");
         if(TAM_nPessoa>0){
-        fgets(nome,TAM_nPessoa,arquivoEntrada);
+        freads(nome,sizeof(char),TAM_nPessoa,arquivoEntrada);
         fputs(nome, stdout);}
         else{printf("--");}
         printf("\nIdade: %d\n", idade);
-        fscanf(arquivoEntrada,"%d",&TAM_nUsuario);
-        fgets(usuario,TAM_nUsuario,arquivoEntrada);
+        fread(&TAM_nUsuario,sizeof(int),1,arquivoEntrada);
+        fread(usuario,sizeof(char),TAM_nUsuario,arquivoEntrada);
         printf("Usuário: ");
         fputs(usuario, stdout);
         printf("\n\n");}
-        else{fseek(arquivoEntrada,TamReg-5,SEEK_CUR);}
+        else{fseek(arquivoEntrada,tamReg-5,SEEK_CUR);}
 
     }
     return;
