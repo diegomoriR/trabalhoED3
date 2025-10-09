@@ -58,7 +58,7 @@ char *mystrsep(char **str, char const *delim) {
     hi.status = '0'; //status incosistente
     INICIO_ARQUIVO(fdh);
     fwrite(&hi.status, sizeof(char), 1, fdh);
-    fseek(fdh, 11, SEEK_SET);
+    fseek(fdh, 12, SEEK_SET);
 
     //Ler os dados do arquivo csv
     //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
@@ -128,11 +128,11 @@ char *mystrsep(char **str, char const *delim) {
         fwrite(&p.idadePessoa, sizeof(int), 1, fdout);
         fwrite(&tamNomePessoa, sizeof(int), 1, fdout);
         if(p.nomePessoa != NULL){
-        fwrite(&p.nomePessoa, sizeof(tamNomePessoa), 1, fdout);
+        fwrite(p.nomePessoa, sizeof(char), tamNomePessoa, fdout);
         }
         fwrite(&tamNomeUsuario, sizeof(int), 1, fdout);
         if(p.nomeUsuario != NULL){
-        fwrite(&p.nomeUsuario, sizeof(tamNomeUsuario), 1, fdout);
+        fwrite(p.nomeUsuario, sizeof(char), tamNomeUsuario, fdout);
         }
     //mais uma pessoa inserida
         hp.quantidadePessoas++;
@@ -140,7 +140,6 @@ char *mystrsep(char **str, char const *delim) {
         indice i;
         i.idPessoa = p.idPessoa;
         i.Offset = Offset;
-        fseek(fdh, 12, SEEK_SET);
         //ordenar os indices
         //printf("id:%d\n",p.idPessoa);
         //printf("offset:%ld\n",i.Offset);
