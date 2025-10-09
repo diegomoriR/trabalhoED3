@@ -30,9 +30,6 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     fwrite(&hp.quantidadePessoas, sizeof(int), 1, fdout);
     fwrite(&hp.quantidadeRemovidos, sizeof(int), 1, fdout);
     fwrite(&hp.Offset, sizeof(long), 1, fdout);
-    //hp.status = '1' //status consistente
-    //INICIO_ARQUIVO(fdout) // cursor do arquivo para o inicio
-    //fwrite(&hp.status, sizeof(char), 1, fdout);
 
     //criar cabecalho do arquivo de indice e status inconsistente
     headerIndice hi;
@@ -120,6 +117,7 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
         indice i;
         i.idPessoa = p.idPessoa;
         i.Offset = Offset;
+        //ordenar os indices
         fwrite(&i.idPessoa, sizeof(int), 1, fdh);
         fwrite(&i.Offset, sizeof(long), 1, fdh);
 
