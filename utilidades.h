@@ -2,12 +2,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "header_pessoa.h"
 
 /*
 Função para imprimir dados salvos no arquivo em binário
 (util para comparar saida no run codes)
 */
-void binarioNaTela(char *nomeArquivoBinario) { 
+void binarioNaTela(char *nomeArquivoBinario) {
 
 	/* Use essa função para comparação no run.codes. Lembre-se de ter fechado (fclose) o arquivo anteriormente.
 	*  Ela vai abrir de novo para leitura e depois fechar (você não vai perder pontos por isso se usar ela). */
@@ -69,6 +70,26 @@ void scan_quote_string(char *str) {
 		strcpy(str, "");
 	}
 }
+
+char *mystrsep(char **str, char const *delim) {
+    char *inicio = *str;
+    char *p;
+    if (inicio == NULL)
+        return NULL;
+    for (p = inicio; *p != '\0'; p++) {
+        const char *d;
+        for (d = delim; *d != '\0'; d++) {
+            if (*p == *d) {
+                *p = '\0';
+                *str = p + 1;
+                return inicio;
+            }
+        }
+    }
+    *str = NULL;
+    return inicio;
+}
+
 /* ---------------- EXTRA ----------------
 
 OPCIONAL: dicas sobre scanf() e fscanf():
@@ -84,3 +105,4 @@ scanf("%[^\n]", string) -> lê até encontrar o fim da linha, não incluindo o '
 scanf("%*c") --> lê um char e não guarda em nenhuma variável, como se tivesse ignorado ele
 
 */
+
