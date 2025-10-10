@@ -2,40 +2,45 @@
 #include <stdlib.h>
 #include <string.h>
 #include "header_pessoa.h"
-#include "header_indice.h"
 
-int main(int argc, char *argv[]){
+
+int main(){
 
 int funcionalidade, buscas;
+char* arquivoEntrada;
+char* arquivoSaida;
+char arquivoIndice;
+char f;
+char str1[100];
+char b;
 
 
-
-FILE *arquivoEntrada = fopen(argv[2], "rb");
-FILE *arquivoSaida = fopen(argv[2], "rb");
-FILE *arquivoIndice = fopen(argv[2], "rb");
-
-    funcionalidade = atoi(argv[1]);
+    
+    scanf("%s", str1);
+    f = strtok(str1," ");
+    funcionalidade = atoi(f);
     switch (funcionalidade)
     {
     case 1:
-        FILE *arquivoIndice = fopen(argv[2], "wb");
+        arquivoIndice = strtok(NULL, " ");
         CREATE_INDEX(arquivoIndice);
         break;
     case 2:
-        FILE *arquivoEntrada = fopen(argv[2], "rb");
-        FILE *arquivoSaida = fopen(argv[3], "wb");
-        FILE *arquivoIndice = fopen(argv[4], "wb");
-        void CREATE_TABLE(arquivoEntrada, arquivoSaida, arquivoIndicePrimario);
+        arquivoEntrada = strtok(NULL, " ");
+        arquivoSaida = strtok(NULL, " ");
+        arquivoIndice = strtok(NULL, " ");
+        CREATE_TABLE(arquivoEntrada, arquivoSaida, arquivoIndice);
         break;
     case 3:
-        FILE *arquivoEntrada = fopen(argv[2], "rb");
-        Select(arquivoEntrada);
+        arquivoEntrada = strtok(NULL, " ");
+        SELECT(arquivoEntrada);
         break;
     case 4:
-        FILE *arquivoEntrada = fopen(argv[2], "rb");
-        FILE *arquivoIndice = fopen(argv[3], "wb");
-        buscas = atoi(argv[4]);
-        Select_Where(arquivoEntrada, arquivoIndice, buscas);
+//        arquivoEntrada = strtok(NULL, " ");
+  //      arquivoIndice = strtok(NULL, " ");
+    //    b = strtok(NULL, " ");
+      //  buscas = atoi(b);
+        //Select_Where(arquivoEntrada, arquivoIndice, buscas);
         break;
     
     default:
@@ -44,4 +49,5 @@ FILE *arquivoIndice = fopen(argv[2], "rb");
 
 
 
-return 0;}
+return 0;
+}
