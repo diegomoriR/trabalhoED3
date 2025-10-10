@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "header_pessoa.h"
-#include "utilidades.h"
+//#include "utilidades.h"
 
 void CREATE_INDEX(char *arquivoIndicePrimario){
     FILE *fd = fopen(arquivoIndicePrimario, "wb"); //abrindo o arquivo para a escrita binaria
@@ -19,6 +19,5 @@ void CREATE_INDEX(char *arquivoIndicePrimario){
     INICIO_ARQUIVO(fd); // cursor do arquivo para o inicio
     fwrite(&h.status, sizeof(char), 1, fd);
     fclose(fd); //fechando arquivo
-    //binarioNaTela(arquivoIndicePrimario);
+    binarioNaTela(arquivoIndicePrimario);
 }
-
