@@ -5,24 +5,11 @@
 
 
 //funcionalidade 3 (SELECT)
-void SELECT(char *arquivoSaida, char *arquivoIndicePrimario){
-
-    FILE *fdh = fopen(arquivoIndicePrimario, "rb");//abrindo o arquivo de indice para a leitura binaria
-    if(fdh == NULL){
-        printf("Falha no processamento do arquivo\n");//verificando se o arquivo foi aberto corretamente
-    }
+void SELECT(char *arquivoSaida){
 
     FILE *fd = fopen(arquivoSaida, "rb"); //abrindo o arquivo de dados pessoa para a leitura binaria
     if(fd == NULL){
         printf("Falha no processamento do arquivo\n");// verificando se o arquivo foi aberto corretamente
-    }
-
-    headerIndice hi;
-    //verificar o status do indice para ver se ta consistente
-    fread(&hi.status, sizeof(char), 1, fdh);
-    if(hi.status == '0'){
-        printf("Falha no processamento do arquivo\n");
-        return;
     }
 
     header h;
@@ -35,16 +22,11 @@ void SELECT(char *arquivoSaida, char *arquivoIndicePrimario){
     //printf("offset:%ld\n",h.Offset);
     int qtdePessoas = h.quantidadePessoas;
     int qtdeRemovidos = h.quantidadeRemovidos;
-    fseek(fdh, 12, SEEK_SET);
 
     //ler todos os dados das pessoas
-    indice index;
     pessoa p;
     //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
     for(int i = 0; i < (qtdePessoas-qtdeRemovidos); i++){
-        fread(&index.idPessoa, sizeof(int), 1, fdh);//leitura o id pessoa no indice primario
-        fread(&index.Offset, sizeof(long), 1, fdh);//leitura do byteoffset no indice primario
-        fseek(fd, index.Offset, SEEK_SET); // pulo no arquivo de dados para o byteoffset do indice primario
         fread(&p.removido,sizeof(char), 1, fd);
         if(p.removido == '0'){ //registro nao esta marcado como removido
             fread(&p.tamanhoRegistro, sizeof(int), 1, fd);
@@ -90,8 +72,8 @@ void SELECT(char *arquivoSaida, char *arquivoIndicePrimario){
         }
 
         fclose(fd);
-        fclose(fdh);
 
         binarioNaTela(arquivoSaida);
-        binarioNaTela(arquivoIndicePrimario);
 }
+
+
