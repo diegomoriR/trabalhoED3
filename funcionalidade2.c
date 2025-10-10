@@ -20,26 +20,6 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
         printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
     }
 
-
-char *mystrsep(char **str, char const *delim) {
-    char *inicio = *str;
-    char *p;
-    if (inicio == NULL)
-        return NULL;
-    for (p = inicio; *p != '\0'; p++) {
-        const char *d;
-        for (d = delim; *d != '\0'; d++) {
-            if (*p == *d) {
-                *p = '\0';
-                *str = p + 1;
-                return inicio;
-            }
-        }
-    }
-    *str = NULL;
-    return inicio;
-}
-
     //criar cabecalho do arquivo de dados pessoa e status inconsistente
     header hp;
     hp.status = '0'; //status incosistente
@@ -141,6 +121,7 @@ char *mystrsep(char **str, char const *delim) {
         i.idPessoa = p.idPessoa;
         i.Offset = Offset;
         //ordenar os indices
+        
         //printf("id:%d\n",p.idPessoa);
         //printf("offset:%ld\n",i.Offset);
         fwrite(&i.idPessoa, sizeof(int), 1, fdh);
