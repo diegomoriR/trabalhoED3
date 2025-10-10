@@ -19,6 +19,7 @@ void SELECT(char *arquivoSaida, char *arquivoIndicePrimario){
 
     headerIndice hi;
     //verificar o status do indice para ver se ta consistente
+    fread(&hi.status, sizeof(char), 1, fdh);
     if(hi.status == '0'){
         printf("Falha no processamento do arquivo\n");
         return;
@@ -45,16 +46,18 @@ void SELECT(char *arquivoSaida, char *arquivoIndicePrimario){
         fread(&index.Offset, sizeof(long), 1, fdh);//leitura do byteoffset no indice primario
         fseek(fd, index.Offset, SEEK_SET); // pulo no arquivo de dados para o byteoffset do indice primario
         fread(&p.removido,sizeof(char), 1, fd);
-        //if(p.removido == '0'){ //registro nao esta marcado como removido
+        if(p.removido == '0'){ //registro nao esta marcado como removido
             fread(&p.tamanhoRegistro, sizeof(int), 1, fd);
             fread(&p.idPessoa, sizeof(int), 1, fd);
             fread(&p.idadePessoa, sizeof(int), 1, fd);
             fread(&p.tamanhoNomePessoa, sizeof(int), 1, fd);
-            p.nomePessoa = (char *) malloc(p.tamanhoNomePessoa);
+            p.nomePessoa = (char *) malloc(p.tamanhoNomePessoa + 1);
             fread(p.nomePessoa, sizeof(char), p.tamanhoNomePessoa, fd);
+            p.nomePessoa[p.tamanhoNomePessoa] = 0;
             fread(&p.tamanhoNomeUsuario,sizeof(int), 1, fd);
             p.nomeUsuario = (char *) malloc(p.tamanhoNomeUsuario);
             fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
+            p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
             //idPessoa
             if(p.idPessoa != -1){
                 printf("Dados da pessoa de codigo %d\n", p.idPessoa);
@@ -80,9 +83,15 @@ void SELECT(char *arquivoSaida, char *arquivoIndicePrimario){
                 printf("Usuario: - \n");
             }
             printf("\n");
+
+        }else{
+            printf("Registro inexistente\n");
+        }
         }
 
         fclose(fd);
         fclose(fdh);
-}
 
+        binarioNaTela(arquivoSaida);
+        binarioNaTela(arquivoIndicePrimario);
+}
