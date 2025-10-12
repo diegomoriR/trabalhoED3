@@ -121,7 +121,7 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
         i.idPessoa = p.idPessoa;
         i.Offset = Offset;
         //ordenar os indices
-        
+        inserirIndiceOrdenado(fdh, i);
         //printf("id:%d\n",p.idPessoa);
         //printf("offset:%ld\n",i.Offset);
         fwrite(&i.idPessoa, sizeof(int), 1, fdh);
