@@ -41,8 +41,10 @@ void SELECT(char *arquivoSaida);
 void scan_quote_string(char *str);
 void binarioNaTela(char *nomeArquivoBinario);
 char *mystrsep(char **str, char const *delim);
+void inserirIndiceOrdenado(FILE *fdh, indice novo);
 
 
 
 #endif
+
 
