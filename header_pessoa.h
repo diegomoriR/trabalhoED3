@@ -36,6 +36,16 @@ typedef struct _indice{
 
 void CREATE_INDEX(char *arquivoIndicePrimario);
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario);
+void SELECT(char *arquivoEntrada);
+void binarioNaTela(char *nomeArquivoBinario);
+void scan_quote_string(char *str);
+void Select_Where(char* fdin, char* fdh, int n);
+
+
+
+
+char* strsep(char** stringp, const char* delim);
+
 
 #endif
 
