@@ -7,40 +7,36 @@
 int main(){
 
 int funcionalidade, buscas;
-char* arquivoEntrada;
-char* arquivoSaida;
-char arquivoIndice;
-char f;
-char str1[100];
+char arquivoEntrada[30];
+char arquivoSaida[30];
+char arquivoIndice[30];
 char b;
 
 
     
-    scanf("%s", str1);
-    f = strtok(str1," ");
-    funcionalidade = atoi(f);
+    scanf("%d", &funcionalidade);
+
     switch (funcionalidade)
     {
     case 1:
-        arquivoIndice = strtok(NULL, " ");
+        scanf("%s", arquivoIndice);
         CREATE_INDEX(arquivoIndice);
         break;
     case 2:
-        arquivoEntrada = strtok(NULL, " ");
-        arquivoSaida = strtok(NULL, " ");
-        arquivoIndice = strtok(NULL, " ");
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoSaida);
+        scanf("%s", arquivoIndice);
         CREATE_TABLE(arquivoEntrada, arquivoSaida, arquivoIndice);
         break;
     case 3:
-        arquivoEntrada = strtok(NULL, " ");
+        scanf("%s", arquivoEntrada);
         SELECT(arquivoEntrada);
         break;
     case 4:
-//        arquivoEntrada = strtok(NULL, " ");
-  //      arquivoIndice = strtok(NULL, " ");
-    //    b = strtok(NULL, " ");
-      //  buscas = atoi(b);
-        //Select_Where(arquivoEntrada, arquivoIndice, buscas);
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoIndice);
+        scanf("%d", &buscas);
+        Select_Where(arquivoEntrada, arquivoIndice, buscas);
         break;
     
     default:
