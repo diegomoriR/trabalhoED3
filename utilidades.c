@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "header_pessoa.h"
 
 /*
 Função para imprimir dados salvos no arquivo em binário
@@ -86,7 +85,6 @@ scanf("%*c") --> lê um char e não guarda em nenhuma variável, como se tivesse
 
 */
 
-
 char* strsep(char** stringp, const char* delim) {
     if (stringp == NULL || *stringp == NULL) {
         return NULL;
@@ -106,7 +104,6 @@ char* strsep(char** stringp, const char* delim) {
 
     return start;
 }
-
 
 void print_registro(pessoa p){
 

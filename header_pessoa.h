@@ -1,5 +1,6 @@
 #ifndef HEADER_PESSOA_H
 #define HEADER_PESSOA_H
+#include <stdio.h>
 
 typedef struct _header{
     char status;
@@ -28,16 +29,36 @@ typedef struct _indice{
     long Offset;
 }indice;
 
+typedef struct _headerSegue{
+    char status;
+    int quantidadePessoas;
+    int proxRRN;
+}headerSegue;
+
+typedef struct _segue{
+    char removido;
+    int idPessoaQueSegue;
+    int idPessoaQueESeguida;
+    char *dataInicioQueSegue;
+    char *dataFimQueSegue;
+    char grauAmizade;
+}segue;
 
 
-#define TAMANHO_INDICE 12
+
+#define TAMANHO_HEADER_INDICE 12
 #define INICIO_ARQUIVO(fd) fseek(fd, 0 , SEEK_SET)
 #define TAMANHO_LINHA 1024
+#define NUMERO_PESSOAS h.quantidadePessoas - h.quantidadeRemovidos
 
 void CREATE_INDEX(char *arquivoIndicePrimario);
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario);
-void SELECT(char *arquivoEntrada);
-void Select_Where(char* fdin, char* fdh, int n);
+void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida);
+void SELECT(char *arquivoSaida);
+void Select_Where(char* arquivoEntrada, char* arquivoIndice, int n);
+void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n);
+
+void scan_quote_string(char *str);
 void binarioNaTela(char *nomeArquivoBinario);
 void scan_quote_string(char *str);
 void print_registro( pessoa p);
@@ -47,9 +68,10 @@ void substitui_registro(FILE* fd,  pessoa p,char campo);
 
 
 
-
-
-
 #endif
+
+
+
+
 
 
