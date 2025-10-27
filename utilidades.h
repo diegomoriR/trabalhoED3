@@ -2,13 +2,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "header_pessoa.h"
 
 /*
 Função para imprimir dados salvos no arquivo em binário
 (util para comparar saida no run codes)
 */
-void binarioNaTela(char *nomeArquivoBinario) {
+void binarioNaTela(char *nomeArquivoBinario) { 
 
 	/* Use essa função para comparação no run.codes. Lembre-se de ter fechado (fclose) o arquivo anteriormente.
 	*  Ela vai abrir de novo para leitura e depois fechar (você não vai perder pontos por isso se usar ela). */
@@ -70,73 +69,6 @@ void scan_quote_string(char *str) {
 		strcpy(str, "");
 	}
 }
-
-char *mystrsep(char **str, char const *delim) {
-    char *inicio = *str;
-    char *p;
-    if (inicio == NULL)
-        return NULL;
-    for (p = inicio; *p != '\0'; p++) {
-        const char *d;
-        for (d = delim; *d != '\0'; d++) {
-            if (*p == *d) {
-                *p = '\0';
-                *str = p + 1;
-                return inicio;
-            }
-        }
-    }
-    *str = NULL;
-    return inicio;
-}
-
-void inserirIndiceOrdenado(FILE *fdh, indice novo){
-    if (fdh == NULL) return;
-    fseek(fdh, 0, SEEK_END);
-    long tamanhoArquivo = ftell(fdh);
-    const long inicioRegistros = 13;
-    int n = (tamanhoArquivo - inicioRegistros) / (sizeof(int) + sizeof(long));
-    if (n == 0) {
-        fseek(fdh, inicioRegistros, SEEK_SET);
-        fwrite(&novo.idPessoa, sizeof(int), 1, fdh);
-        fwrite(&novo.Offset, sizeof(long), 1, fdh);
-        return;
-    }
-    int ini = 0, fim = n - 1, meio, pos = n;
-    indice temp;
-    while (ini <= fim) {
-        meio = (ini + fim) / 2;
-        fseek(fdh, inicioRegistros + meio * (sizeof(int) + sizeof(long)), SEEK_SET);
-        fread(&temp.idPessoa, sizeof(int), 1, fdh);
-        if (temp.idPessoa == novo.idPessoa) {
-            pos = meio;
-            break;
-        } else if (temp.idPessoa > novo.idPessoa) {
-            pos = meio;
-            fim = meio - 1;
-        } else {
-            ini = meio + 1;
-        }
-    }
-    if (ini > fim) pos = ini;
-    size_t tamanhoRegistro = sizeof(int) + sizeof(long);
-    long origem = inicioRegistros + pos * tamanhoRegistro;
-    long destino = origem + tamanhoRegistro;
-    for (int i = n - 1; i >= pos; i--) {
-        long posLeitura = inicioRegistros + i * tamanhoRegistro;
-        fseek(fdh, posLeitura, SEEK_SET);
-        indice temp2;
-        fread(&temp2.idPessoa, sizeof(int), 1, fdh);
-        fread(&temp2.Offset, sizeof(long), 1, fdh);
-        fseek(fdh, posLeitura + tamanhoRegistro, SEEK_SET);
-        fwrite(&temp2.idPessoa, sizeof(int), 1, fdh);
-        fwrite(&temp2.Offset, sizeof(long), 1, fdh);
-    }
-    fseek(fdh, origem, SEEK_SET);
-    fwrite(&novo.idPessoa, sizeof(int), 1, fdh);
-    fwrite(&novo.Offset, sizeof(long), 1, fdh);
-}
-
 /* ---------------- EXTRA ----------------
 
 OPCIONAL: dicas sobre scanf() e fscanf():
@@ -152,4 +84,3 @@ scanf("%[^\n]", string) -> lê até encontrar o fim da linha, não incluindo o '
 scanf("%*c") --> lê um char e não guarda em nenhuma variável, como se tivesse ignorado ele
 
 */
-
