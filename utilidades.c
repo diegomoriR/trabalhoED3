@@ -84,3 +84,23 @@ scanf("%[^\n]", string) -> lê até encontrar o fim da linha, não incluindo o '
 scanf("%*c") --> lê um char e não guarda em nenhuma variável, como se tivesse ignorado ele
 
 */
+
+char* strsep(char** stringp, const char* delim) {
+    if (stringp == NULL || *stringp == NULL) {
+        return NULL;
+    }
+    
+    char* start = *stringp;
+    char* p = strpbrk(start, delim); // Encontra o primeiro delimitador
+
+    if (p == NULL) {
+        // Nenhum delimitador encontrado, este é o último token
+        *stringp = NULL;
+    } else {
+        // Delimitador encontrado
+        *p = '\0';             // Substitui o delimitador por nulo
+        *stringp = p + 1;      // Avança o ponteiro principal para depois do nulo
+    }
+
+    return start;
+}
