@@ -1,6 +1,5 @@
 #ifndef HEADER_PESSOA_H
 #define HEADER_PESSOA_H
-#include <stdio.h>
 
 typedef struct _header{
     char status;
@@ -37,12 +36,15 @@ typedef struct _indice{
 
 void CREATE_INDEX(char *arquivoIndicePrimario);
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario);
-void SELECT(char *arquivoSaida);
-void scan_quote_string(char *str);
+void SELECT(char *arquivoEntrada);
 void binarioNaTela(char *nomeArquivoBinario);
-char *mystrsep(char **str, char const *delim);
-void inserirIndiceOrdenado(FILE *fdh, indice novo);
+void scan_quote_string(char *str);
+void Select_Where(char* fdin, char* fdh, int n);
 
+
+
+
+char* strsep(char** stringp, const char* delim);
 
 
 #endif
