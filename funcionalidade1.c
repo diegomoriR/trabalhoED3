@@ -1,13 +1,18 @@
+//Lucas Soares Leite Santos - 15472162
+//Diego Mori Rodrigues - 13782421
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "header_pessoa.h"
-//#include "utilidades.h"
+
 
 void CREATE_INDEX(char *arquivoIndicePrimario){
     FILE *fd = fopen(arquivoIndicePrimario, "wb"); //abrindo o arquivo para a escrita binaria
     if(fd == NULL){
         printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
+        return;
     }
     headerIndice h;
     h.status = '0'; // status inconsistente
