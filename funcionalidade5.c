@@ -38,10 +38,7 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
         //puxando o indice para a RAM
         indice *indices = (indice *)malloc(NUMERO_PESSOAS * sizeof(indice));
         //lendo o indice para a RAM
-        if (fread(indices, sizeof(indice), NUMERO_PESSOAS, fdh) != NUMERO_PESSOAS) {
-            printf("Aviso: Leitura incompleta do índice. Trabalhando com o que foi lido.\n");
-        }
-
+        fread(indices, sizeof(indice), NUMERO_PESSOAS, fdh);
 
         if(strcmp(tipoBusca, "idPessoa") == 0){
 
@@ -84,9 +81,7 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
                         hi.status = '0'; //status inconsistente
                         fwrite(&hi.status, sizeof(char), 1, fdh);
                         fseek(fdh, 12, SEEK_SET);//inicio do arquivo de indice
-                        if (fwrite(indices, sizeof(indice), NUMERO_PESSOAS, fdh) != NUMERO_PESSOAS) {
-                            printf("Aviso: Escrita incompleta do índice. Trabalhando com o que foi lido.\n");
-                        }//escrita no arquivo de indice
+                        fwrite(indices, sizeof(indice), NUMERO_PESSOAS, fdh);//escrita no arquivo de indice
                         hi.status = '1'; //status consistente
                         INICIO_ARQUIVO(fdh);
                         fwrite(&hi.status, sizeof(char), 1, fdh);
@@ -151,9 +146,7 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
                         hi.status = '0'; //status inconsistente
                         fwrite(&hi.status, sizeof(char), 1, fdh);
                         fseek(fdh, 12, SEEK_SET);//inicio do arquivo de indice
-                        if (fwrite(indices, sizeof(indice), NUMERO_PESSOAS, fdh) != NUMERO_PESSOAS) {
-                            printf("Aviso: Escrita incompleta do índice. Trabalhando com o que foi lido.\n");
-                        }//escrita no arquivo de indice
+                        fwrite(indices, sizeof(indice), NUMERO_PESSOAS, fdh);//escrita no arquivo de indice
                         hi.status = '1'; //status consistente
                         INICIO_ARQUIVO(fdh);
                         fwrite(&hi.status, sizeof(char), 1, fdh);
@@ -218,9 +211,7 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
                         hi.status = '0'; //status inconsistente
                         fwrite(&hi.status, sizeof(char), 1, fdh);
                         fseek(fdh, 12, SEEK_SET);//inicio do arquivo de indice
-                        if (fwrite(indices, sizeof(indice), NUMERO_PESSOAS, fdh) != NUMERO_PESSOAS) {
-                            printf("Aviso: Escrita incompleta do índice. Trabalhando com o que foi lido.\n");
-                        }//escrita no arquivo de indice
+                        fwrite(indices, sizeof(indice), NUMERO_PESSOAS, fdh); //escrita no arquivo de indice
                         hi.status = '1'; //status consistente
                         INICIO_ARQUIVO(fdh);
                         fwrite(&hi.status, sizeof(char), 1, fdh);
@@ -289,9 +280,7 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
                         hi.status = '0'; //status inconsistente
                         fwrite(&hi.status, sizeof(char), 1, fdh);
                         fseek(fdh, 12, SEEK_SET);//inicio do arquivo de indice
-                        if (fwrite(indices, sizeof(indice), NUMERO_PESSOAS, fdh) != NUMERO_PESSOAS) {
-                            printf("Aviso: Escrita incompleta do índice. Trabalhando com o que foi lido.\n");
-                        }//escrita no arquivo de indice
+                        fwrite(indices, sizeof(indice), NUMERO_PESSOAS, fdh);//escrita no arquivo de indice
                         hi.status = '1'; //status consistente
                         INICIO_ARQUIVO(fdh);
                         fwrite(&hi.status, sizeof(char), 1, fdh);
@@ -329,4 +318,6 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
     fclose(fdh);
     return;
 }
+
+
 
