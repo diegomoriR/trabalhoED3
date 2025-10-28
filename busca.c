@@ -3,7 +3,7 @@
 #include <string.h>
 #include "header_pessoa.h"
 
-pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca, int param){
+pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
 
     if(fd == NULL){
         printf("Falha no processamento do arquivo\n");
@@ -16,16 +16,18 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca, int param){
     header h;
     pessoa p;
     indice i;
-    int b;
+    int b = 0;
+    int param;
+    char parametro[30];
 
     INICIO_ARQUIVO(fd);
 
         if(strcmp(tipoBusca, "idPessoa") == 0){
-
-            fread(&hi.status, sizeof(char), 1, fdh);// vê o status do arquivo de indice
+            scanf("%d", &param);// pega o parametro a ser buscado
+            fread(&hi.status, sizeof(char), 1, fdh);// vÃª o status do arquivo de indice
             fseek(fdh, 12, SEEK_SET);// vai para os dados do arquivo indice
-            fread(&h.status, sizeof(char), 1, fd);//vê o status do arquivo pessoa
-            fread(&h.quantidadePessoas, sizeof(int), 1, fd);//vê o número de pessoas
+            fread(&h.status, sizeof(char), 1, fd);//vÃª o status do arquivo pessoa
+            fread(&h.quantidadePessoas, sizeof(int), 1, fd);//vÃª o nÃºmero de pessoas
             fread(&h.quantidadeRemovidos, sizeof(int), 1, fd); //ve o numero de removidos
             if(hi.status == '0'){
                 fclose(fd);
@@ -41,15 +43,15 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca, int param){
             }
 
 
-             for(int k=0; k < (NUMERO_PESSOAS); k++){//busca até o número total de pessoas
+             for(int k=0; k < (NUMERO_PESSOAS); k++){//busca atÃ© o nÃºmero total de pessoas
 
-                fread(&i.idPessoa, sizeof(int), 1, fdh);//lê o id da pessoa no arquivo indice
+                fread(&i.idPessoa, sizeof(int), 1, fdh);//lÃª o id da pessoa no arquivo indice
                 //idPessoa
-                if(i.idPessoa == param){//verifica se é igual ao parâmetro buscado
+                if(i.idPessoa == param){//verifica se Ã© igual ao parÃ¢metro buscado
 
-                    fread(&i.Offset, sizeof(long), 1, fdh);//lê o byte offset
+                    fread(&i.Offset, sizeof(long), 1, fdh);//lÃª o byte offset
                     fseek(fd, i.Offset, SEEK_SET);  //vai para o offset no arquivo pessoa
-                    fread(&p.removido,sizeof(char), 1, fd);//vê o caracter 0 ou 1 de remoção
+                    fread(&p.removido,sizeof(char), 1, fd);//vÃª o caracter 0 ou 1 de remoÃ§Ã£o
                     fread(&p.tamanhoRegistro, sizeof(int), 1, fd);//pega o tamanho do registro
                     if(p.removido == '0'){ //registro nao esta marcado como removido
                         fread(&p.idPessoa, sizeof(int), 1, fd);
@@ -66,16 +68,17 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca, int param){
                         return p;
                     }else{
                         fseek(fdh, sizeof(long), SEEK_CUR);
-                    }//vai para o próximo id no arquivo indice
+                    }//vai para o prÃ³ximo id no arquivo indice
                 }
                 if(b == 0){
                     printf("Registro inexistente.\n\n");
-                }//nenhum registro encontrado com esse parâmetro
+                }//nenhum registro encontrado com esse parÃ¢metro
             }
             }
 
             //idadePessoa
         else if(strcmp(tipoBusca, "idadePessoa") == 0){
+            scanf("%d", &param);// pega o parametro a ser buscado
             fseek(fd, 1, SEEK_SET); // cursor para o inicio do registro de cabecalho
             fread(&h.quantidadePessoas, sizeof(int), 1, fd);
             fread(&h.quantidadeRemovidos,sizeof(int), 1, fd);
@@ -98,41 +101,21 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca, int param){
                     fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
                     p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
 
-                if(p.idadePessoa == param){//verifica se é o parâmetro buscado
+                if(p.idadePessoa == param){//verifica se Ã© o parÃ¢metro buscado
                         b++;
                         return p;
                 }
                 }else{
-                    fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
+                    fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o prÃ³ximo
                     free(p.nomePessoa);
                     free(p.nomeUsuario);}
                 }
             if(b == 0){
                 printf("Registro inexistente.\n\n");
-            }//nenhum registro encontrado com esse parâmetro
+            }//nenhum registro encontrado com esse parÃ¢metro
         }
 
-
-
-}
-
-pessoa busca_char(FILE *fd, FILE *fdh, char *tipoBusca, char *parametro){
-    if(fd == NULL){
-        printf("Falha no processamento do arquivo\n");
-    }
-    if(fdh == NULL){
-        printf("Falha no processamento do arquivo\n");
-    }
-
-    headerIndice hi;
-    header h;
-    pessoa p;
-    indice i;
-    int b;
-
-    INICIO_ARQUIVO(fd);
-
-    //nomePessoa
+        //nomePessoa
         if(strcmp(tipoBusca,"nomePessoa")==0){
             scan_quote_string(parametro);
             fseek(fd, 1, SEEK_SET); // cursor para o inicio do registro de cabecalho
@@ -157,18 +140,18 @@ pessoa busca_char(FILE *fd, FILE *fdh, char *tipoBusca, char *parametro){
                 fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
                 p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
 
-                if(strcmp(parametro, p.nomePessoa) == 0){//verifica se é o parâmetro buscado
+                if(strcmp(parametro, p.nomePessoa) == 0){//verifica se Ã© o parÃ¢metro buscado
                     b++;
                     return p;
             }
             }else{
-                fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
+                fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o prÃ³ximo
                 free(p.nomePessoa);
                 free(p.nomeUsuario);}
             }
             if(b==0){
                 printf("Registro inexistente.\n\n");
-            }//nenhum registro encontrado com esse parâmetro
+            }//nenhum registro encontrado com esse parÃ¢metro
         }
 
 
@@ -197,17 +180,19 @@ pessoa busca_char(FILE *fd, FILE *fdh, char *tipoBusca, char *parametro){
                     fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
                     p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
 
-                    if(strcmp(parametro,p.nomeUsuario) == 0){//verifica se é o parâmetro buscado
+                    if(strcmp(parametro,p.nomeUsuario) == 0){//verifica se Ã© o parÃ¢metro buscado
                         b++;
                         return p;
                     }
-                }else{fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
+                }else{fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o prÃ³ximo
                     free(p.nomePessoa);
                     free(p.nomeUsuario);}
             }
             if(b==0){
                 printf("Registro inexistente.\n\n");
-            }//nenhum registro encontrado com esse parâmetro
+            }//nenhum registro encontrado com esse parÃ¢metro
 
         }
+
+
 }
