@@ -6,7 +6,7 @@
 
 int main(){
 
-int funcionalidade, buscas;
+int funcionalidade, vezes;
 char arquivoEntrada[30];
 char arquivoSaida[30];
 char arquivoIndice[30];
@@ -35,10 +35,39 @@ char b;
     case 4:
         scanf("%s", arquivoEntrada);
         scanf("%s", arquivoIndice);
-        scanf("%d", &buscas);
-        Select_Where(arquivoEntrada, arquivoIndice, buscas);
+        scanf("%d", &vezes);
+        Select_Where(arquivoEntrada, arquivoIndice, vezes);
         break;
-    
+    case 5:
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoIndice);
+        scanf("%d", &vezes);
+        DELETE(arquivoEntrada, arquivoIndice, vezes);
+        break;
+    case 6:
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoIndice);
+        scanf("%d", &vezes);
+        INSERT_INTO(arquivoEntrada, arquivoIndice, vezes);
+        break;
+    case 7:
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoIndice);
+        scanf("%d", &vezes);
+        UPDATE(arquivoEntrada, arquivoIndice, vezes);
+        break;
+    case 8:
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoIndice);
+        CREATE_TABLE_2(arquivoEntrada,arquivoSaida);
+        break;
+    case 9:
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoIndice);
+        ORDER_BY(arquivoEntrada,arquivoSaida);
+        break;
+    case 10:
+        break;
     default:
         break;
     }
