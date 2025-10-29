@@ -50,20 +50,25 @@ typedef struct _segue{
 #define INICIO_ARQUIVO(fd) fseek(fd, 0 , SEEK_SET)
 #define TAMANHO_LINHA 1024
 #define NUMERO_PESSOAS h.quantidadePessoas - h.quantidadeRemovidos
+#define TAMANHO_INDICE 12
 
 void CREATE_INDEX(char *arquivoIndicePrimario);
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario);
-void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida);
 void SELECT(char *arquivoSaida);
 void Select_Where(char* arquivoEntrada, char* arquivoIndice, int n);
+void INSERT_INTO( char *arquivoSaida, char *arquivoIndicePrimario, int NInsert);
 void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n);
+void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n);
+void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida);
+void ORDER_BY(char* arquivoEntrada, char* arquivoSaida);
 
-void scan_quote_string(char *str);
+
 void binarioNaTela(char *nomeArquivoBinario);
 void scan_quote_string(char *str);
 void print_registro( pessoa p);
 char* strsep(char** stringp, const char* delim);
-void substitui_registro(FILE* fd,  pessoa p,char campo);
+void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo);
+int comparaSegue(const void *a, const void *b);
 
 
 
