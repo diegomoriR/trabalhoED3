@@ -74,27 +74,7 @@ void Select_Where(char* arquivoEntrada, char* arquivoIndice, int n){
                  p.nomeUsuario = (char *) malloc(p.tamanhoNomeUsuario + 1);
                  fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fdin);
                  p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
-                //imprime os dados
-                if(p.idPessoa != -1){
-                printf("Dados da pessoa de codigo %d\n", p.idPessoa);
-                }else{
-                printf("Dados da pessoa de codigo -\n");
-                }
-                if(p.tamanhoNomePessoa != 0){
-                printf("Nome: %s\n", p.nomePessoa);
-                }else{
-                printf("Nome: - \n");
-                }
-                if(p.idadePessoa != -1){
-                    printf("Idade: %d\n", p.idadePessoa);
-                }else{
-                     printf("Idade: -\n");
-                }
-                if(p.nomeUsuario != NULL){
-                    printf("Usuario: %s\n\n", p.nomeUsuario);
-                }else{
-                    printf("Usuario: - \n\n");
-                }
+                print_registro(p);
                 free(p.nomePessoa);
                 free(p.nomeUsuario);               
                }
@@ -131,27 +111,7 @@ void Select_Where(char* arquivoEntrada, char* arquivoIndice, int n){
                  if(p.idadePessoa == param){//verifica se é o parâmetro buscado
                     
                 b++;//aumenta o número de registros encontrados
-                //imprime os dados
-                if(p.idPessoa != -1){
-                printf("Dados da pessoa de codigo %d\n", p.idPessoa);
-                }else{
-                printf("Dados da pessoa de codigo -\n");
-                }
-                if(p.tamanhoNomePessoa != 0){
-                    printf("Nome: %s\n", p.nomePessoa);
-                }else{
-                    printf("Nome: - \n");
-                }
-                if(p.idadePessoa != -1){
-                    printf("Idade: %d\n", p.idadePessoa);
-                }else{
-                     printf("Idade: -\n");
-                }
-                if(p.tamanhoNomeUsuario != 0){
-                    printf("Usuario: %s\n\n", p.nomeUsuario);
-                }else{
-                    printf("Usuario: - \n\n");
-                }
+                print_registro(p);
                 free(p.nomePessoa);
                 free(p.nomeUsuario);
 
@@ -165,9 +125,6 @@ void Select_Where(char* arquivoEntrada, char* arquivoIndice, int n){
         }//caso busca idade
 
 
-
-
-        
         else if(strcmp(tipoBusca,"nomePessoa")==0){
             scan_quote_string(parametro);
             fseek(fdin, 1, SEEK_SET); // cursor para o inicio do registro de cabecalho
@@ -195,27 +152,7 @@ void Select_Where(char* arquivoEntrada, char* arquivoIndice, int n){
                  if(strcmp(parametro,p.nomePessoa)==0){//verifica se é o parâmetro buscado
                     
                 b++;//aumenta o número de registros encontrados
-                //imprime os dados
-                if(p.idPessoa != -1){
-                printf("Dados da pessoa de codigo %d\n", p.idPessoa);
-                }else{
-                printf("Dados da pessoa de codigo -\n");
-                }
-                if(p.tamanhoNomePessoa != 0){
-                    printf("Nome: %s\n", p.nomePessoa);
-                }else{
-                    printf("Nome: - \n");
-                }
-                if(p.idadePessoa != -1){
-                    printf("Idade: %d\n", p.idadePessoa);
-                }else{
-                     printf("Idade: -\n");
-                }
-                if(p.tamanhoNomeUsuario != 0){
-                    printf("Usuario: %s\n\n", p.nomeUsuario);
-                }else{
-                    printf("Usuario: - \n\n");
-                }
+                print_registro(p);
                 free(p.nomePessoa);
                 free(p.nomeUsuario);
 
@@ -256,27 +193,7 @@ void Select_Where(char* arquivoEntrada, char* arquivoIndice, int n){
                  if(strcmp(parametro,p.nomeUsuario)==0){//verifica se é o parâmetro buscado
                     
                 b++;//aumenta o número de registros encontrados
-                //imprime os dados
-                if(p.idPessoa != -1){
-                printf("Dados da pessoa de codigo %d\n", p.idPessoa);
-                }else{
-                printf("Dados da pessoa de codigo -\n");
-                }
-                if(p.tamanhoNomePessoa != 0){
-                    printf("Nome: %s\n", p.nomePessoa);
-                }else{
-                    printf("Nome: -\n");
-                }
-                if(p.idadePessoa != -1){
-                    printf("Idade: %d\n", p.idadePessoa);
-                }else{
-                     printf("Idade: - \n");
-                }
-                if(p.tamanhoNomeUsuario != 0){
-                    printf("Usuario: %s\n\n", p.nomeUsuario);
-                }else{
-                    printf("Usuario: - \n\n");
-                }
+                print_registro(p);
                 free(p.nomePessoa);
                 free(p.nomeUsuario);
 

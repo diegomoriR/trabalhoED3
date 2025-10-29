@@ -49,31 +49,9 @@ void SELECT(char *arquivoSaida){
             p.nomeUsuario = (char *) malloc(p.tamanhoNomeUsuario+1);
             fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
             p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
-            //idPessoa
-            if(p.idPessoa != -1){
-                printf("Dados da pessoa de codigo %d\n", p.idPessoa);
-            }else{
-                printf("Dados da pessoa de codigo -\n");
-            }
-            //nomePessoa
-            if(p.tamanhoNomePessoa != 0){
-                printf("Nome: %s\n", p.nomePessoa);
-            }else{
-                printf("Nome: - \n");
-            }
-            //idadePessoa
-            if(p.idadePessoa != -1){
-                printf("Idade: %d\n", p.idadePessoa);
-            }else{
-                printf("Idade: -\n");
-            }
-            //usuarioPessoa
-            if(p.tamanhoNomeUsuario != 0){
-                printf("Usuario: %s\n", p.nomeUsuario);
-            }else{
-                printf("Usuario: - \n");
-            }
-            printf("\n");
+
+            print_registro(p);
+            
             free(p.nomePessoa);
             free(p.nomeUsuario);
 

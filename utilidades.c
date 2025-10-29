@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include "header_pessoa.h"
 
 /*
 Função para imprimir dados salvos no arquivo em binário
@@ -135,13 +136,19 @@ void print_registro(pessoa p){
 
 }
 
-void substitui_registro(FILE* fd,  pessoa p,char campo){
+void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo){
 
  int Ncampo;
  char NcampoString[30];
  char lixo = '$';
+ header h;
+ indice i;
 
 	fseek(fd, -p.tamanhoRegistro, SEEK_CUR);
+	h.Offset=ftell(fd);
+	fseek(fd,0,SEEK_SET);
+	fwrite('0',sizeof(char),1,fd);
+	fseek(fd,h.Offset,SEEK_SET);
 
 	if(strcmp(campo,"nomePessoa")==0){
 	
@@ -152,13 +159,30 @@ void substitui_registro(FILE* fd,  pessoa p,char campo){
 			fwrite(strlen(NcampoString),sizeof(int),1,fd);
 			fwrite(NcampoString,sizeof(char),strlen(NcampoString),fd);
 			fwrite(lixo,sizeof(char),p.tamanhoNomePessoa-strlen(Ncampo),fd);
+
+			h.status='1';
+			fseek(fd,0,SEEK_SET);
+			fwrite(&h.status,sizeof(char),1,fd);
 		}
 
 		else{
 			p.tamanhoNomePessoa = strlen(NcampoString);
 			strcpy(p.nomePessoa,NcampoString);
 			p.tamanhoRegistro = 16 + p.tamanhoNomePessoa + p.tamanhoNomeUsuario;
+			fwrite('1',sizeof(char),1,fd);
+
+			fseek(fd,0,SEEK_SET);
+			fwrite(&h.status,sizeof(char),1,fd);
+			fread(&h.quantidadePessoas,sizeof(int),1,fd);
+			fread(&h.quantidadeRemovidos,sizeof(int),1,fd);
+			fseek(fd,-4,SEEK_CUR);
+			h.quantidadeRemovidos++;
+			fwrite(&h.quantidadeRemovidos,sizeof(int),1,fd);
+			fwrite(&h.Offset,sizeof(long),1,fd);
+
+
 			fseek(fd,0,SEEK_END);
+			h.Offset=ftell(fd);
 			fwrite(&p.removido, sizeof(char), 1, fd);
         	fwrite(&p.tamanhoRegistro, sizeof(int), 1, fd);
         	fwrite(&p.idPessoa, sizeof(int), 1, fd);
@@ -167,6 +191,29 @@ void substitui_registro(FILE* fd,  pessoa p,char campo){
         	fwrite(p.nomePessoa, sizeof(char), p.tamanhoNomePessoa, fd);
         	fwrite(&p.tamanhoNomeUsuario, sizeof(int), 1, fd);
 			fwrite(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
+
+			h.status='1';
+			fseek(fd,0,SEEK_SET);
+			fwrite(&h.status,sizeof(char),1,fd);
+
+			fseek(fdh,0,SEEK_SET);
+			fwrite('0',sizeof(char),1,fdh);
+			fseek(fdh,TAMANHO_INDICE,SEEK_SET);
+			fread(&i.idPessoa,sizeof(int),1,fdh);
+			fread(&i.Offset,sizeof(long),1,fdh);
+			while(p.idPessoa>=i.idPessoa){
+				if(p.idPessoa==i.idPessoa){
+					fseek(fdh,-sizeof(long),SEEK_CUR);
+					fwrite(&h.Offset,sizeof(long),1,fdh);
+					break;
+				}
+				else{
+					fread(&i.idPessoa,sizeof(int),1,fdh);
+					fread(&i.Offset,sizeof(long),1,fdh);
+				}
+			}
+			fseek(fdh,0,SEEK_SET);
+			fwrite('1',sizeof(char),1,fdh);
 			}
 	}
 
@@ -179,13 +226,29 @@ void substitui_registro(FILE* fd,  pessoa p,char campo){
 			fwrite(strlen(NcampoString),sizeof(int),1,fd);
 			fwrite(NcampoString,sizeof(char),strlen(NcampoString),fd);
 			fwrite(lixo,sizeof(char),p.tamanhoNomePessoa-strlen(Ncampo),fd);
+
+			h.status='1';
+			fseek(fd,0,SEEK_SET);
+			fwrite(&h.status,sizeof(char),1,fd);
 		}
 
 		else{
 			p.tamanhoNomeUsuario = strlen(NcampoString);
 			strcpy(p.nomeUsuario,NcampoString);
 			p.tamanhoRegistro = 16 + p.tamanhoNomePessoa + p.tamanhoNomeUsuario;
+			fwrite('1',sizeof(char),1,fd);
+
+			fseek(fd,0,SEEK_SET);
+			fwrite(&h.status,sizeof(char),1,fd);
+			fread(&h.quantidadePessoas,sizeof(int),1,fd);
+			fread(&h.quantidadeRemovidos,sizeof(int),1,fd);
+			fseek(fd,-4,SEEK_CUR);
+			h.quantidadeRemovidos++;
+			fwrite(&h.quantidadeRemovidos,sizeof(int),1,fd);
+			fwrite(&h.Offset,sizeof(long),1,fd);
+
 			fseek(fd,0,SEEK_END);
+			h.Offset=ftell(fd);
 			fwrite(&p.removido, sizeof(char), 1, fd);
         	fwrite(&p.tamanhoRegistro, sizeof(int), 1, fd);
         	fwrite(&p.idPessoa, sizeof(int), 1, fd);
@@ -194,19 +257,137 @@ void substitui_registro(FILE* fd,  pessoa p,char campo){
         	fwrite(p.nomePessoa, sizeof(char), p.tamanhoNomePessoa, fd);
         	fwrite(&p.tamanhoNomeUsuario, sizeof(int), 1, fd);
 			fwrite(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
+
+			h.status='1';
+			fseek(fd,0,SEEK_SET);
+			fwrite(&h.status,sizeof(char),1,fd);
+
+			fseek(fdh,0,SEEK_SET);
+			fwrite('0',sizeof(char),1,fdh);
+			fseek(fdh,TAMANHO_INDICE,SEEK_SET);
+			fread(&i.idPessoa,sizeof(int),1,fdh);
+			fread(&i.Offset,sizeof(long),1,fdh);
+			while(p.idPessoa>=i.idPessoa){
+				if(p.idPessoa==i.idPessoa){
+					fseek(fdh,-sizeof(long),SEEK_CUR);
+					fwrite(&h.Offset,sizeof(long),1,fdh);
+					break;
+				}
+				else{
+					fread(&i.idPessoa,sizeof(int),1,fdh);
+					fread(&i.Offset,sizeof(long),1,fdh);
+				}
+			}
+			fseek(fdh,0,SEEK_SET);
+			fwrite('1',sizeof(char),1,fdh);
 			}
 	}
+	
+	
 	else if(strcmp(campo,"idPessoa")==0){
 		scanf("%d",&Ncampo);
 
 			fwrite(&Ncampo,sizeof(int),1,fd);
+
+		h.status='1';
+		fseek(fd,0,SEEK_SET);
+		fwrite(&h.status,sizeof(char),1,fd);
+
+		fseek(fdh,0,SEEK_SET);
+		fwrite('0',sizeof(char),1,fdh);
+		fseek(fdh,TAMANHO_INDICE,SEEK_SET);
+		fread(&i.idPessoa,sizeof(int),1,fdh);
+		fread(&i.Offset,sizeof(long),1,fdh);
+		while(p.idPessoa>=i.idPessoa){
+			if(p.idPessoa==i.idPessoa){
+				fseek(fdh,-TAMANHO_INDICE,SEEK_CUR);
+				fwrite(&Ncampo,sizeof(int),1,fdh);
+				break;
+			}
+			else{
+				fread(&i.idPessoa,sizeof(int),1,fdh);
+				fread(&i.Offset,sizeof(long),1,fdh);
+			}
+		}
+		fseek(fdh,0,SEEK_SET);
+		fwrite('1',sizeof(char),1,fdh);
 		
 	}
 	else if(strcmp(campo,"idadePessoa")==0){
 
-				scanf("%d",&Ncampo);
+		scanf("%d",&Ncampo);
+
 			fseek(fd,4,SEEK_CUR);
 			fwrite(&Ncampo,sizeof(int),1,fd);
+
+		h.status='1';
+		fseek(fd,0,SEEK_SET);
+		fwrite(&h.status,sizeof(char),1,fd);
 	}
 
+}
+
+int comparaSegue(const void *a, const void *b) {
+    // Converte os ponteiros genéricos (void*) de volta para o nosso tipo (segue*)
+    const segue *regA = (const segue *)a;
+    const segue *regB = (const segue *)b;
+
+
+    // CRITÉRIO 1: idPessoaQueSegue (crescente) 
+    int a_idSegueNulo = (regA->idPessoaQueSegue == -1);
+    int b_idSegueNulo = (regB->idPessoaQueSegue == -1);
+
+    if (a_idSegueNulo != b_idSegueNulo) {
+        // Se um é nulo e o outro não, o não-nulo (0) vem antes do nulo (1).
+        return a_idSegueNulo - b_idSegueNulo; // (0 - 1 = -1) ou (1 - 0 = 1)
+    }
+    if (regA->idPessoaQueSegue != regB->idPessoaQueSegue) {
+        // Ambos não-nulos e diferentes, ordena crescentemente
+        if(regA->idPessoaQueSegue < regB->idPessoaQueSegue){return -1;}
+		else {return 1;}
+    }
+
+    // CRITÉRIO 2: idPessoaQueESeguida (crescente)
+    int a_idSeguidaNulo = (regA->idPessoaQueESeguida == -1);
+    int b_idSeguidaNulo = (regB->idPessoaQueESeguida == -1);
+
+    if (a_idSeguidaNulo != b_idSeguidaNulo) {
+        return a_idSeguidaNulo - b_idSeguidaNulo; // não-nulo (0) antes de nulo (1)
+    }
+    if (regA->idPessoaQueSegue != regB->idPessoaQueSegue) {
+        // Ambos não-nulos e diferentes, ordena crescentemente
+        if(regA->idPessoaQueSegue < regB->idPessoaQueSegue){return -1;}
+		else {return 1;}
+    }
+
+    // CRITÉRIO 3: dataInicioQueSegue (crescente)
+    int a_inicioNulo = (regA->dataInicioQueSegue[0] == '$');
+    int b_inicioNulo = (regB->dataInicioQueSegue[0] == '$');
+
+    if (a_inicioNulo != b_inicioNulo) {
+        return a_inicioNulo - b_inicioNulo; // não-nulo (0) antes de nulo (1)
+    }
+    else{ 
+        int cmp_inicio = memcmp(regA->dataInicioQueSegue, regB->dataInicioQueSegue, 10);
+        if (cmp_inicio != 0) {
+            return cmp_inicio;
+        }
+    }
+
+    // CRITÉRIO 4: dataFimQueSegue (crescente)
+    int a_fimNulo = (regA->dataFimQueSegue[0] == '\0');
+    int b_fimNulo = (regB->dataFimQueSegue[0] == '\0');
+
+    if (a_fimNulo != b_fimNulo) {
+        return a_fimNulo - b_fimNulo; // não-nulo (0) antes de nulo (1)
+    }
+    else{ // Só compara se ambos não forem nulos
+        int cmp_fim = memcmp(regA->dataFimQueSegue, regB->dataFimQueSegue, 10);
+        if (cmp_fim != 0) {
+            return cmp_fim;
+        }
+    }
+
+    // EMPATE TOTAL
+    return 0;
 }

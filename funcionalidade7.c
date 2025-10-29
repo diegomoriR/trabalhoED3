@@ -12,13 +12,13 @@
 void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
 
 
-    FILE *fdin = fopen(arquivoEntrada, "rb"); // abrindo o arquivo para ler os dados
+    FILE *fdin = fopen(arquivoEntrada, "rb+"); // abrindo o arquivo para ler os dados
     if(fdin == NULL){
         printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
         return;
     }
 
-    FILE *fdh = fopen(arquivoIndice, "rb"); // abrindo o arquivo para a escrita binaria no indice
+    FILE *fdh = fopen(arquivoIndice, "rb+"); // abrindo o arquivo para a escrita binaria no indice
     if(fdh == NULL){
         printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
         return;
@@ -78,7 +78,7 @@ void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
                  fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fdin);
                  p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
 
-                substitui_registro(fdin, p,campo);
+                substitui_registro(fdin, fdh, p,campo);
                 free(p.nomePessoa);
                 free(p.nomeUsuario);               
                }
@@ -117,7 +117,7 @@ void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
                  
                  if(p.idadePessoa == param){//verifica se é o parâmetro buscado
                     
-                substitui_registro(fdin, p,campo);
+                substitui_registro(fdin, fdh p,campo);
                 free(p.nomePessoa);
                 free(p.nomeUsuario);
 
@@ -160,7 +160,7 @@ void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
                  
                  if(strcmp(parametro,p.nomePessoa)==0){//verifica se é o parâmetro buscado
                     
-                substitui_registro(fdin, p,campo);
+                substitui_registro(fdin, fdh, p,campo);
                 free(p.nomePessoa);
                 free(p.nomeUsuario);
 
@@ -202,7 +202,7 @@ void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
                  
                  if(strcmp(parametro,p.nomeUsuario)==0){//verifica se é o parâmetro buscado
                     
-                substitui_registro(fdin, p,campo);
+                substitui_registro(fdin, fdh, p,campo);
                 free(p.nomePessoa);
                 free(p.nomeUsuario);
 
