@@ -107,36 +107,37 @@ char* strsep(char** stringp, const char* delim) {
 }
 
 void print_registro(pessoa p){
+if(p.removido=='1'){return;}
 
-            //idPessoa
-            if(p.idPessoa != -1){
-                printf("Dados da pessoa de codigo %d\n", p.idPessoa);
-            }else{
-                printf("Dados da pessoa de codigo -\n");
-            }
-            //nomePessoa
-            if(p.tamanhoNomePessoa != 0){
-                printf("Nome: %s\n", p.nomePessoa);
-            }else{
-                printf("Nome: - \n");
-            }
-            //idadePessoa
-            if(p.idadePessoa != -1){
-                printf("Idade: %d\n", p.idadePessoa);
-            }else{
-                printf("Idade: -\n");
-            }
-            //usuarioPessoa
-            if(p.tamanhoNomeUsuario != 0){
-                printf("Usuario: %s\n", p.nomeUsuario);
-            }else{
-                printf("Usuario: - \n");
-            }
-            printf("\n");
-
+    //idPessoa
+    if(p.idPessoa != -1){
+    printf("Dados da pessoa de codigo %d\n", p.idPessoa);
+    }else{
+    printf("Dados da pessoa de codigo -\n");
+    }
+    //nomePessoa
+    if(p.tamanhoNomePessoa != 0){
+    printf("Nome: %s\n", p.nomePessoa);
+    }else{
+    printf("Nome: - \n");
+    }
+    //idadePessoa
+    if(p.idadePessoa != -1){
+    printf("Idade: %d\n", p.idadePessoa);
+    }else{
+    printf("Idade: -\n");
+    }
+    //usuarioPessoa
+    if(p.tamanhoNomeUsuario != 0){
+    printf("Usuario: %s\n", p.nomeUsuario);
+    }else{
+    printf("Usuario: - \n");
+    }
+    printf("\n");
+return;
 }
 
-void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo){
+void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char* campo){
 
  int Ncampo;
  char NcampoString[30];
@@ -146,19 +147,21 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo){
 
 	fseek(fd, -p.tamanhoRegistro, SEEK_CUR);
 	h.Offset=ftell(fd);
+	h.status='0';
 	fseek(fd,0,SEEK_SET);
-	fwrite('0',sizeof(char),1,fd);
+	fwrite(&h.status,sizeof(char),1,fd);
 	fseek(fd,h.Offset,SEEK_SET);
 
 	if(strcmp(campo,"nomePessoa")==0){
 	
 		scan_quote_string(NcampoString);
+		int tam = strlen(NcampoString);
 
-		if(p.tamanhoNomePessoa>=strlen(NcampoString)){
+		if(p.tamanhoNomePessoa>=tam){
 			fseek(fd,8,SEEK_CUR);
-			fwrite(strlen(NcampoString),sizeof(int),1,fd);
-			fwrite(NcampoString,sizeof(char),strlen(NcampoString),fd);
-			fwrite(lixo,sizeof(char),p.tamanhoNomePessoa-strlen(Ncampo),fd);
+			fwrite(&tam,sizeof(int),1,fd);
+			fwrite(NcampoString,sizeof(char),tam,fd);
+			fwrite(&lixo,sizeof(char),p.tamanhoNomePessoa-tam,fd);
 
 			h.status='1';
 			fseek(fd,0,SEEK_SET);
@@ -166,10 +169,11 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo){
 		}
 
 		else{
-			p.tamanhoNomePessoa = strlen(NcampoString);
+			p.removido='1';
+			p.tamanhoNomePessoa = tam;
 			strcpy(p.nomePessoa,NcampoString);
 			p.tamanhoRegistro = 16 + p.tamanhoNomePessoa + p.tamanhoNomeUsuario;
-			fwrite('1',sizeof(char),1,fd);
+			fwrite(&p.removido,sizeof(char),1,fd);
 
 			fseek(fd,0,SEEK_SET);
 			fwrite(&h.status,sizeof(char),1,fd);
@@ -178,11 +182,13 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo){
 			fseek(fd,-4,SEEK_CUR);
 			h.quantidadeRemovidos++;
 			fwrite(&h.quantidadeRemovidos,sizeof(int),1,fd);
-			fwrite(&h.Offset,sizeof(long),1,fd);
+
 
 
 			fseek(fd,0,SEEK_END);
 			h.Offset=ftell(fd);
+			long offset = h.Offset;
+			p.removido='0';
 			fwrite(&p.removido, sizeof(char), 1, fd);
         	fwrite(&p.tamanhoRegistro, sizeof(int), 1, fd);
         	fwrite(&p.idPessoa, sizeof(int), 1, fd);
@@ -193,39 +199,39 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo){
 			fwrite(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
 
 			h.status='1';
+			fseek(fd,0,SEEK_END);
+			h.Offset=ftell(fd);
 			fseek(fd,0,SEEK_SET);
 			fwrite(&h.status,sizeof(char),1,fd);
+			fseek(fd,8,SEEK_SET);
+			fwrite(&h.Offset,sizeof(long),1,fd);
 
 			fseek(fdh,0,SEEK_SET);
-			fwrite('0',sizeof(char),1,fdh);
+			h.status='0';
+			fwrite(&h.status,sizeof(char),1,fdh);
 			fseek(fdh,TAMANHO_INDICE,SEEK_SET);
-			fread(&i.idPessoa,sizeof(int),1,fdh);
-			fread(&i.Offset,sizeof(long),1,fdh);
-			while(p.idPessoa>=i.idPessoa){
-				if(p.idPessoa==i.idPessoa){
-					fseek(fdh,-sizeof(long),SEEK_CUR);
-					fwrite(&h.Offset,sizeof(long),1,fdh);
-					break;
-				}
-				else{
-					fread(&i.idPessoa,sizeof(int),1,fdh);
-					fread(&i.Offset,sizeof(long),1,fdh);
-				}
-			}
+			busca_ind(p.idPessoa,fdh,0,h.quantidadePessoas);
+			fread(&p.idPessoa,sizeof(int),1,fdh);
+			fwrite(&offset,sizeof(long),1,fdh);
+
+			h.status='1';
 			fseek(fdh,0,SEEK_SET);
-			fwrite('1',sizeof(char),1,fdh);
+			fwrite(&h.status,sizeof(char),1,fdh);
+			fseek(fd,8,SEEK_SET);
+			fwrite(&h.Offset,sizeof(long),1,fd);
 			}
 	}
 
 
 	else if(strcmp(campo,"nomeUsuario")==0){
 		scan_quote_string(NcampoString);
+		int tam = strlen(NcampoString);
 
-		if(p.tamanhoNomePessoa>=strlen(NcampoString)){
+		if(p.tamanhoNomePessoa>=tam){
 			fseek(fd,12+p.tamanhoNomePessoa,SEEK_CUR);
-			fwrite(strlen(NcampoString),sizeof(int),1,fd);
-			fwrite(NcampoString,sizeof(char),strlen(NcampoString),fd);
-			fwrite(lixo,sizeof(char),p.tamanhoNomePessoa-strlen(Ncampo),fd);
+			fwrite(&tam,sizeof(int),1,fd);
+			fwrite(NcampoString,sizeof(char),tam,fd);
+			fwrite(&lixo,sizeof(char),p.tamanhoNomePessoa-tam,fd);
 
 			h.status='1';
 			fseek(fd,0,SEEK_SET);
@@ -233,10 +239,11 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo){
 		}
 
 		else{
-			p.tamanhoNomeUsuario = strlen(NcampoString);
+			p.removido='1';
+			p.tamanhoNomeUsuario = tam;
 			strcpy(p.nomeUsuario,NcampoString);
 			p.tamanhoRegistro = 16 + p.tamanhoNomePessoa + p.tamanhoNomeUsuario;
-			fwrite('1',sizeof(char),1,fd);
+			fwrite(&p.removido,sizeof(char),1,fd);
 
 			fseek(fd,0,SEEK_SET);
 			fwrite(&h.status,sizeof(char),1,fd);
@@ -245,10 +252,13 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo){
 			fseek(fd,-4,SEEK_CUR);
 			h.quantidadeRemovidos++;
 			fwrite(&h.quantidadeRemovidos,sizeof(int),1,fd);
-			fwrite(&h.Offset,sizeof(long),1,fd);
+
+
 
 			fseek(fd,0,SEEK_END);
 			h.Offset=ftell(fd);
+			long offset = h.Offset;
+			p.removido='0';
 			fwrite(&p.removido, sizeof(char), 1, fd);
         	fwrite(&p.tamanhoRegistro, sizeof(int), 1, fd);
         	fwrite(&p.idPessoa, sizeof(int), 1, fd);
@@ -259,27 +269,26 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo){
 			fwrite(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
 
 			h.status='1';
+			fseek(fd,0,SEEK_END);
+			h.Offset=ftell(fd);
 			fseek(fd,0,SEEK_SET);
 			fwrite(&h.status,sizeof(char),1,fd);
+			fseek(fd,8,SEEK_SET);
+			fwrite(&h.Offset,sizeof(long),1,fd);
 
 			fseek(fdh,0,SEEK_SET);
-			fwrite('0',sizeof(char),1,fdh);
+			h.status='0';
+			fwrite(&h.status,sizeof(char),1,fdh);
 			fseek(fdh,TAMANHO_INDICE,SEEK_SET);
-			fread(&i.idPessoa,sizeof(int),1,fdh);
-			fread(&i.Offset,sizeof(long),1,fdh);
-			while(p.idPessoa>=i.idPessoa){
-				if(p.idPessoa==i.idPessoa){
-					fseek(fdh,-sizeof(long),SEEK_CUR);
-					fwrite(&h.Offset,sizeof(long),1,fdh);
-					break;
-				}
-				else{
-					fread(&i.idPessoa,sizeof(int),1,fdh);
-					fread(&i.Offset,sizeof(long),1,fdh);
-				}
-			}
+			busca_ind(p.idPessoa,fdh,0,h.quantidadePessoas);
+			fread(&p.idPessoa,sizeof(int),1,fdh);
+			fwrite(&offset,sizeof(long),1,fdh);
+
 			fseek(fdh,0,SEEK_SET);
-			fwrite('1',sizeof(char),1,fdh);
+			h.status='1';
+			fwrite(&h.status,sizeof(char),1,fdh);
+			fseek(fd,8,SEEK_SET);
+			fwrite(&h.Offset,sizeof(long),1,fd);
 			}
 	}
 	
@@ -294,25 +303,20 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo){
 		fwrite(&h.status,sizeof(char),1,fd);
 
 		fseek(fdh,0,SEEK_SET);
-		fwrite('0',sizeof(char),1,fdh);
+		h.status = '0';
+		fwrite(&h.status,sizeof(char),1,fdh);
 		fseek(fdh,TAMANHO_INDICE,SEEK_SET);
 		fread(&i.idPessoa,sizeof(int),1,fdh);
 		fread(&i.Offset,sizeof(long),1,fdh);
-		while(p.idPessoa>=i.idPessoa){
-			if(p.idPessoa==i.idPessoa){
-				fseek(fdh,-TAMANHO_INDICE,SEEK_CUR);
-				fwrite(&Ncampo,sizeof(int),1,fdh);
-				break;
-			}
-			else{
-				fread(&i.idPessoa,sizeof(int),1,fdh);
-				fread(&i.Offset,sizeof(long),1,fdh);
-			}
-		}
+		busca_ind(p.idPessoa,fdh,0,h.quantidadePessoas);
+		fwrite(&p.idPessoa,sizeof(int),1,fdh);
 		fseek(fdh,0,SEEK_SET);
-		fwrite('1',sizeof(char),1,fdh);
+		h.status='1';
+		fwrite(&h.status,sizeof(char),1,fdh);
 		
 	}
+	
+	
 	else if(strcmp(campo,"idadePessoa")==0){
 
 		scanf("%d",&Ncampo);
@@ -391,3 +395,231 @@ int comparaSegue(const void *a, const void *b) {
     // EMPATE TOTAL
     return 0;
 }
+
+pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
+
+    if(fd == NULL){
+        printf("Falha no processamento do arquivo\n");
+		exit(-1);
+    }
+    if(fdh == NULL){
+        printf("Falha no processamento do arquivo\n");
+		exit(-1);
+    }
+
+    headerIndice hi;
+    header h;
+    pessoa p;
+    indice i;
+    int b = 0;
+    int param;
+    char parametro[30];
+
+    INICIO_ARQUIVO(fd);
+
+        if(strcmp(tipoBusca, "idPessoa") == 0){
+            scanf("%d", &param);// pega o parametro a ser buscado
+            fread(&hi.status, sizeof(char), 1, fdh);// vê o status do arquivo de indice
+            fseek(fdh, 12, SEEK_SET);// vai para os dados do arquivo indice
+            fread(&h.status, sizeof(char), 1, fd);//vê o status do arquivo pessoa
+            fread(&h.quantidadePessoas, sizeof(int), 1, fd);//vê o número de pessoas
+            fread(&h.quantidadeRemovidos, sizeof(int), 1, fd); //ve o numero de removidos
+            if(hi.status == '0'){
+                fclose(fd);
+                fclose(fdh);
+                printf("status do indice inconsistente\n");
+                exit(-1);
+            }
+            if(h.status == '0'){
+                fclose(fd);
+                fclose(fdh);
+                printf("status do arquivo pessoa inconsistente\n");
+                exit(-1);
+            }
+
+
+            busca_ind(param,fdh,0,h.quantidadePessoas);
+            fread(&i.idPessoa, sizeof(int), 1, fdh);//lê o id da pessoa no arquivo indice
+            //idPessoa
+            if(i.idPessoa == param){//verifica se é igual ao parâmetro buscado
+
+                fread(&i.Offset, sizeof(long), 1, fdh);//lê o byte offset
+                fseek(fd, i.Offset, SEEK_SET);  //vai para o offset no arquivo pessoa
+                fread(&p.removido,sizeof(char), 1, fd);//vê o caracter 0 ou 1 de remoção
+                fread(&p.tamanhoRegistro, sizeof(int), 1, fd);//pega o tamanho do registro
+                if(p.removido == '0'){ //registro nao esta marcado como removido
+                    fread(&p.idPessoa, sizeof(int), 1, fd);
+                    fread(&p.idadePessoa, sizeof(int), 1, fd);
+                    fread(&p.tamanhoNomePessoa, sizeof(int), 1, fd);
+                    p.nomePessoa = (char *) malloc(p.tamanhoNomePessoa + 1);
+                    fread(p.nomePessoa, sizeof(char), p.tamanhoNomePessoa, fd);
+                    p.nomePessoa[p.tamanhoNomePessoa] = 0;
+                    fread(&p.tamanhoNomeUsuario,sizeof(int), 1, fd);
+                    p.nomeUsuario = (char *) malloc(p.tamanhoNomeUsuario + 1);
+                    fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
+                    p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
+                    b++;
+                    fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
+                    return p;
+                	}
+                }
+                if(b == 0){
+                    printf("Registro inexistente.\n\n");
+                }//nenhum registro encontrado com esse parâmetro
+            
+            }
+
+            //idadePessoa
+        else if(strcmp(tipoBusca, "idadePessoa") == 0){
+            scanf("%d", &param);// pega o parametro a ser buscado
+            fseek(fd, 1, SEEK_SET); // cursor para o inicio do registro de cabecalho
+            fread(&h.quantidadePessoas, sizeof(int), 1, fd);
+            fread(&h.quantidadeRemovidos,sizeof(int), 1, fd);
+            fread(&h.Offset,sizeof(long), 1, fd);
+            for(int k = 0; k < (NUMERO_PESSOAS); k++){
+
+                fread(&p.removido,sizeof(char), 1, fd);
+                fread(&p.tamanhoRegistro, sizeof(int), 1, fd);
+
+                if(p.removido == '0'){ //registro nao esta marcado como removido
+
+                    fread(&p.idPessoa, sizeof(int), 1, fd);
+                    fread(&p.idadePessoa, sizeof(int), 1, fd);
+                    fread(&p.tamanhoNomePessoa, sizeof(int), 1, fd);
+                    p.nomePessoa = (char *) malloc(p.tamanhoNomePessoa + 1);
+                    fread(p.nomePessoa, sizeof(char), p.tamanhoNomePessoa, fd);
+                    p.nomePessoa[p.tamanhoNomePessoa] = 0;
+                    fread(&p.tamanhoNomeUsuario,sizeof(int), 1, fd);
+                    p.nomeUsuario = (char *) malloc(p.tamanhoNomeUsuario + 1);
+                    fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
+                    p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
+
+                if(p.idadePessoa == param){//verifica se é o parâmetro buscado
+                        b++;
+                        fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
+                        return p;
+                }
+                }else{
+                    fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
+                    free(p.nomePessoa);
+                    free(p.nomeUsuario);}
+                }
+            if(b == 0){
+                printf("Registro inexistente.\n\n");
+            }//nenhum registro encontrado com esse parâmetro
+        }
+
+        //nomePessoa
+        if(strcmp(tipoBusca,"nomePessoa")==0){
+            scan_quote_string(parametro);
+            fseek(fd, 1, SEEK_SET); // cursor para o inicio do registro de cabecalho
+            fread(&h.quantidadePessoas, sizeof(int), 1, fd);
+            fread(&h.quantidadeRemovidos, sizeof(int), 1, fd);
+            fread(&h.Offset, sizeof(long), 1, fd);
+            for(int k = 0; k < NUMERO_PESSOAS; k++){
+
+                fread(&p.removido,sizeof(char), 1, fd);
+                fread(&p.tamanhoRegistro, sizeof(int), 1, fd);
+
+            if(p.removido == '0'){ //registro nao esta marcado como removido
+
+                fread(&p.idPessoa, sizeof(int), 1, fd);
+                fread(&p.idadePessoa, sizeof(int), 1, fd);
+                fread(&p.tamanhoNomePessoa, sizeof(int), 1, fd);
+                p.nomePessoa = (char *) malloc(p.tamanhoNomePessoa + 1);
+                fread(p.nomePessoa, sizeof(char), p.tamanhoNomePessoa, fd);
+                p.nomePessoa[p.tamanhoNomePessoa] = 0;
+                fread(&p.tamanhoNomeUsuario,sizeof(int), 1, fd);
+                p.nomeUsuario = (char *) malloc(p.tamanhoNomeUsuario + 1);
+                fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
+                p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
+
+                if(strcmp(parametro, p.nomePessoa) == 0){//verifica se é o parâmetro buscado
+                    b++;
+                    fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
+                    return p;
+            }
+            }else{
+                fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
+                free(p.nomePessoa);
+                free(p.nomeUsuario);}
+            }
+            if(b==0){
+                printf("Registro inexistente.\n\n");
+            }//nenhum registro encontrado com esse parâmetro
+        }
+
+
+        //nomeUsuario
+        else if(strcmp(tipoBusca, "nomeUsuario") == 0){
+            scan_quote_string(parametro);
+            fseek(fd, 1, SEEK_SET); // cursor para o inicio do registro de cabecalho
+            fread(&h.quantidadePessoas, sizeof(int), 1, fd);
+            fread(&h.quantidadeRemovidos,sizeof(int), 1, fd);
+            fread(&h.Offset,sizeof(long), 1, fd);
+            for(int k = 0; k < (NUMERO_PESSOAS); k++){
+
+                fread(&p.removido,sizeof(char), 1, fd);
+                fread(&p.tamanhoRegistro, sizeof(int), 1, fd);
+
+                if(p.removido == '0'){ //registro nao esta marcado como removido
+
+                    fread(&p.idPessoa, sizeof(int), 1, fd);
+                    fread(&p.idadePessoa, sizeof(int), 1, fd);
+                    fread(&p.tamanhoNomePessoa, sizeof(int), 1, fd);
+                    p.nomePessoa = (char *) malloc(p.tamanhoNomePessoa + 1);
+                    fread(p.nomePessoa, sizeof(char), p.tamanhoNomePessoa, fd);
+                    p.nomePessoa[p.tamanhoNomePessoa] = 0;
+                    fread(&p.tamanhoNomeUsuario,sizeof(int), 1, fd);
+                    p.nomeUsuario = (char *) malloc(p.tamanhoNomeUsuario + 1);
+                    fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
+                    p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
+
+                    if(strcmp(parametro,p.nomeUsuario) == 0){//verifica se é o parâmetro buscado
+                        b++;
+                        fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
+                        return p;
+                    }
+                }else{fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
+                    free(p.nomePessoa);
+                    free(p.nomeUsuario);}
+            }
+            if(b==0){
+                printf("Registro inexistente.\n\n");
+            }//nenhum registro encontrado com esse parâmetro
+
+        }
+
+p.removido='1';
+return p;
+}
+
+int busca_ind(int id, FILE* indices,int inicio, int fim){
+
+	if(inicio>fim){
+	fseek(indices,(inicio+1)*TAMANHO_INDICE,SEEK_SET);
+	return inicio;
+	}
+
+	int meio = inicio + (fim-inicio)/2;
+	int ind;
+
+	fseek(indices,(meio+1)*TAMANHO_INDICE,SEEK_SET);
+	fread(&ind,sizeof(int),1,indices);
+
+
+	if(ind<id){
+		
+		return busca_ind(id,indices,meio+1,fim);
+	}
+	if(ind>id){
+
+		return busca_ind(id,indices,inicio,meio-1);
+	}
+	if(ind==id){
+		fseek(indices,-sizeof(int),SEEK_CUR);
+		return meio;
+	}
+
+}
+

@@ -67,8 +67,10 @@ void binarioNaTela(char *nomeArquivoBinario);
 void scan_quote_string(char *str);
 void print_registro( pessoa p);
 char* strsep(char** stringp, const char* delim);
-void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char campo);
+void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char* campo);
 int comparaSegue(const void *a, const void *b);
+pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca);
+int busca_ind(int id, FILE* indices,int inicio, int fim);
 
 
 

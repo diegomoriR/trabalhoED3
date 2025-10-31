@@ -40,7 +40,7 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
         char *pointer = linha;
 
     //idPessoaQueSegue
-        str1 = mystrsep(&pointer, ",");
+        str1 = strsep(&pointer, ",");
         if(str1 != NULL){
             s.idPessoaQueSegue = atoi(str1);
         }else{
@@ -48,14 +48,14 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
         }
         //printf("id:%d\n",p.idPessoa);
     //idPessoaQueESeguida
-        str1 = mystrsep(&pointer, ",");
+        str1 = strsep(&pointer, ",");
         if(str1 !=NULL){
             s.idPessoaQueESeguida = atoi(str1);
         }else{
             s.idPessoaQueESeguida = -1;
         }
         //dataInicioQueSegue
-        str1 = mystrsep(&pointer, ",");
+        str1 = strsep(&pointer, ",");
         if(str1 != NULL){
             char dataInicio[10];
             strcpy(dataInicio, str1);
@@ -66,7 +66,7 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
             }
         }
         //dataFimQueSegue
-        str1 = mystrsep(&pointer, ",");
+        str1 = strsep(&pointer, ",");
         if(str1 != NULL){
             char dataFim[10];
             strcpy(dataFim, str1);
@@ -77,7 +77,7 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
             }
         }
         //grauAmizade
-        str1 = mystrsep(&pointer, ",");
+        str1 = strsep(&pointer, ",");
         if(str1 != NULL){
             s.grauAmizade = *str1;
         }else{

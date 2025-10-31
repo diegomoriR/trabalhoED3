@@ -12,9 +12,9 @@
 
 
 //funcionalidade 6 (INSERT_INTO)
-void INSERT_INTO( char *arquivoSaida, char *arquivoIndicePrimario, int NInsert){
+void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert){
 
-    FILE *fdout = fopen(arquivoSaida, "wb"); // abrindo o arquivo para a escrita binaria no arquivo de dados
+    FILE *fdout = fopen(arquivoPessoa, "rb+"); // abrindo o arquivo para a escrita binaria no arquivo de dados
     if(fdout == NULL){
         printf("Falha no processamento do arquivo.\n");
         return;// verificando se o arquivo foi aberto corretamente
@@ -25,10 +25,13 @@ void INSERT_INTO( char *arquivoSaida, char *arquivoIndicePrimario, int NInsert){
         return;// verificando se o arquivo foi aberto corretamente
     }
 
-    char nums[NInsert];
 
-    //criar cabecalho do arquivo de dados pessoa e status inconsistente
+    //ler cabecalho do arquivo de dados pessoa e status inconsistente
     header hp;
+    INICIO_ARQUIVO(fdout);
+    fread(&hp.status, sizeof(char), 1, fdh);
+    if(hp.status=='0'){printf("arquivo indice inconsistente");
+    return;}
     hp.status = '0'; //status incosistente
     fwrite(&hp.status, sizeof(char), 1, fdout);
     fread(&hp.quantidadePessoas, sizeof(int), 1, fdout);
@@ -46,23 +49,23 @@ void INSERT_INTO( char *arquivoSaida, char *arquivoIndicePrimario, int NInsert){
     INICIO_ARQUIVO(fdh);
     fwrite(&hi.status, sizeof(char), 1, fdh);
     fseek(fdh,TAMANHO_INDICE,SEEK_SET);
-    //Ler os dados do arquivo csv
+    //Ler os dados
     //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
     pessoa p;
-    char l[TAMANHO_LINHA]; // linha para ler os dados
+
     int ciclos =0;
+    char nums[NInsert];
 
 
-    while(ciclos<NInsert){ // ler as linhas ate o final do arquivo csv
+    while(ciclos<NInsert){ // ler as linhas ate a ultima inserção
         
 
         char* str1;
-        char* linha = l;
         int tamNomePessoa;
         int tamNomeUsuario;
         
 
-        nums[ciclos]=strsep(&linha," ");
+        scanf(" %c", &nums[ciclos]);
 
     //id Pessoa
         scanf(" %[^,]", str1);
@@ -150,9 +153,19 @@ void INSERT_INTO( char *arquivoSaida, char *arquivoIndicePrimario, int NInsert){
         i.Offset = Offset;
         
         if(i.idPessoa!=-1){
-            buscaInd(i.idPessoa); 
+        fseek(fdh,TAMANHO_INDICE,SEEK_SET);
+        int quant = busca_ind(i.idPessoa, fdh,0, hp.quantidadePessoas);
+        int id; 
+        for(quant;quant<=hp.quantidadePessoas; quant++){
+        if(fread(&id,sizeof(int),1,fdh)!=0){
+            fread(&Offset,sizeof(long),1,fdh);
+            fseek(fdh,-TAMANHO_INDICE,SEEK_CUR);
+        }
         fwrite(&i.idPessoa, sizeof(int), 1, fdh);
         fwrite(&i.Offset, sizeof(long), 1, fdh);
+        i.idPessoa=id;
+        i.Offset=Offset;
+        }
         }
 
         ciclos++;
@@ -179,6 +192,6 @@ void INSERT_INTO( char *arquivoSaida, char *arquivoIndicePrimario, int NInsert){
     fclose(fdout);
     fclose(fdh);
 
-    binarioNaTela(arquivoSaida);
+    binarioNaTela(arquivoPessoa);
     binarioNaTela(arquivoIndicePrimario);
 }
