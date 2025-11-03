@@ -42,8 +42,8 @@ void Select_Where(char* arquivoEntrada, char* arquivoIndice, int n){
         scanf(" %[^=]", tipoBusca);
         scanf("%*c");
         fseek(fdin, 0, SEEK_SET);//coloca no começo do arquivo pessoa
-        p = busca_int(fdin, fdh,tipoBusca);
-        print_registro(p);
+        busca_print(fdin, fdh,tipoBusca);
+        
     }
 
     fclose(fdin);

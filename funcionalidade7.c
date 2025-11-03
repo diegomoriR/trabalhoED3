@@ -48,12 +48,16 @@ void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
         scanf("%*c");
         scanf(" %[^=]", campo);
         scanf("%*c");
+
         substitui_registro(fdin,fdh,p,campo);
 
         }
 
+
     fclose(fdin);
     fclose(fdh);
+    binarioNaTela(arquivoEntrada);
+    binarioNaTela(arquivoIndice);
     return;
 
 }

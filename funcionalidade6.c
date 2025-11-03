@@ -29,10 +29,11 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
     //ler cabecalho do arquivo de dados pessoa e status inconsistente
     header hp;
     INICIO_ARQUIVO(fdout);
-    fread(&hp.status, sizeof(char), 1, fdh);
-    if(hp.status=='0'){printf("arquivo indice inconsistente");
+    fread(&hp.status, sizeof(char), 1, fdout);
+    if(hp.status=='0'){printf("arquivo pessoa inconsistente");
     return;}
     hp.status = '0'; //status incosistente
+    INICIO_ARQUIVO(fdout);
     fwrite(&hp.status, sizeof(char), 1, fdout);
     fread(&hp.quantidadePessoas, sizeof(int), 1, fdout);
     fread(&hp.quantidadeRemovidos, sizeof(int), 1, fdout);
@@ -48,49 +49,49 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
     hi.status = '0'; //status incosistente
     INICIO_ARQUIVO(fdh);
     fwrite(&hi.status, sizeof(char), 1, fdh);
-    fseek(fdh,TAMANHO_INDICE,SEEK_SET);
     //Ler os dados
     //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
     pessoa p;
+    char l[TAMANHO_LINHA]; // linha para ler os dados
+    fseek(fdout, hp.Offset, SEEK_SET);
 
-    int ciclos =0;
-    char nums[NInsert];
-
-
-    while(ciclos<NInsert){ // ler as linhas ate a ultima inserção
+    for(int i = 0;i<NInsert;i++){
         
+        scanf("%s",l);
 
-        char* str1;
+
         int tamNomePessoa;
         int tamNomeUsuario;
-        
-
-        scanf(" %c", &nums[ciclos]);
 
     //id Pessoa
-        scanf(" %[^,]", str1);
-        
-        if(strcmp(str1,"NULO")!=0 && strlen(str1) > 0){
-            p.idPessoa = atoi(str1);
+        scanf("%*c");
+        scanf("%[^,]", l);
+        if(strcmp(l,"NULO")!=0 && strlen(l) > 0){
+            p.idPessoa = atoi(l);
         }else{
             p.idPessoa = -1;
         }
         
     //nome Pessoa
-        scan_quote_string(str1);
-        if(strcmp(str1,"NULO")!=0 && strlen(str1) > 0){
+        scanf("%*c");
+        scan_quote_string(l);
+        if(strcmp(l,"NULO")!=0 && strlen(l) > 0){
             // Remover o caractere de nova linha, se presente
-            size_t len = strlen(str1);
-            if (len > 0 && (str1[len-1] == '\n' || str1[len-1] == '\r')) {
-                str1[len-1] = '\0';
+            size_t len = strlen(l);
+            if (len > 0 && (l[len-1] == '\n' || l[len-1] == '\r')) {
+                l[len-1] = '\0';
                 len--;
             }
         // Se a string ainda contiver \r, remova-o também
-        if (len > 0 && str1[len-1] == '\r') {
-            str1[len-1] = '\0';
+        if (len > 0 && l[len-1] == '\r') {
+            l[len-1] = '\0';
             len--;
         }
-            p.nomePessoa = strdup(str1);
+        if (len > 0 && l[len-1] == '\"') {
+            l[len-1] = '\0';
+            len--;
+        }
+            p.nomePessoa = strdup(l);
             tamNomePessoa = len;
         }else{
             p.nomePessoa = NULL;
@@ -98,27 +99,29 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
         }
        
     //idade Pessoa
-        scanf(" %[^,]", str1);
-        if(strcmp(str1,"NULO")!=0 && strlen(str1) > 0){
-            p.idadePessoa = atoi(str1);
+        scanf("%*c");
+        scanf("%[^,]", l);
+        if(strcmp(l,"NULO")!=0 && strlen(l) > 0){
+            p.idadePessoa = atoi(l);
         }else{
             p.idadePessoa = -1;
         }
     
     //nome Usuario
-        scan_quote_string(str1);
-        if(strcmp(str1,"NULO")!=0 && strlen(str1) > 0){
+        scanf("%*c");
+        scan_quote_string(l);
+        if(strcmp(l,"NULO")!=0 && strlen(l) > 0){
             // Remover o caractere de nova linha, se presente
-            size_t len = strlen(str1);
-            if (len > 0 && (str1[len-1] == '\n' || str1[len-1] == '\r')) {
-                str1[len-1] = '\0';
+            size_t len = strlen(l);
+            if (len > 0 && (l[len-1] == '\n' || l[len-1] == '\r')) {
+                l[len-1] = '\0';
                 len--;
             }
-        if (len > 0 && str1[len-1] == '\r') {
-            str1[len-1] = '\0';
+        if (len > 0 && l[len-1] == '\r') {
+            l[len-1] = '\0';
             len--;
         }
-            p.nomeUsuario = strdup(str1);
+            p.nomeUsuario = strdup(l);
             tamNomeUsuario = len;
         }else{
             p.nomeUsuario = NULL;
@@ -148,27 +151,12 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
         hp.quantidadePessoas++;
     //escrevendo o arquivo do indice
         indice i;
-        int idArquivo;
         i.idPessoa = p.idPessoa;
         i.Offset = Offset;
+        inserirIndiceOrdenado(fdh, i);
         
-        if(i.idPessoa!=-1){
-        fseek(fdh,TAMANHO_INDICE,SEEK_SET);
-        int quant = busca_ind(i.idPessoa, fdh,0, hp.quantidadePessoas);
-        int id; 
-        for(quant;quant<=hp.quantidadePessoas; quant++){
-        if(fread(&id,sizeof(int),1,fdh)!=0){
-            fread(&Offset,sizeof(long),1,fdh);
-            fseek(fdh,-TAMANHO_INDICE,SEEK_CUR);
-        }
-        fwrite(&i.idPessoa, sizeof(int), 1, fdh);
-        fwrite(&i.Offset, sizeof(long), 1, fdh);
-        i.idPessoa=id;
-        i.Offset=Offset;
-        }
-        }
 
-        ciclos++;
+
     }
 
 
@@ -179,8 +167,6 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
     hp.status = '1'; //status consistente
     fwrite(&hp.status, sizeof(char), 1, fdout);
     fwrite(&hp.quantidadePessoas, sizeof(int), 1, fdout);
-    fwrite(&hp.quantidadeRemovidos, sizeof(int), 1, fdout);
-    fwrite(&hp.Offset, sizeof(long), 1, fdout);
 
 
     //atualizando cabecalho do arquivo de indice

@@ -149,14 +149,9 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
         hp.quantidadePessoas++;
     //escrevendo o arquivo do indice
         indice i;
-        int idArquivo;
         i.idPessoa = p.idPessoa;
         i.Offset = Offset;
-        
-        if(i.idPessoa!=-1){ 
-        fwrite(&i.idPessoa, sizeof(int), 1, fdh);
-        fwrite(&i.Offset, sizeof(long), 1, fdh);
-        }
+        inserirIndiceOrdenado(fdh, i);
     }
 
 
