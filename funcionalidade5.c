@@ -20,7 +20,7 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
     }
 
     int buscas[n];
-    int param;
+    int param, pos;
     char tipoBusca[15];
     char parametro[30];
 
@@ -44,8 +44,11 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
         //tem que ajeitar o arquivo indice agora
     }
 
+
     fclose(fd);
     fclose(fdh);
+    binarioNaTela(arquivoEntrada);
+    binarioNaTela(arquivoIndicePrimario);
     return;
 
 }

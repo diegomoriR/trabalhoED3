@@ -43,7 +43,6 @@ void Select_Where(char* arquivoEntrada, char* arquivoIndice, int n){
         scanf("%*c");
         fseek(fdin, 0, SEEK_SET);//coloca no começo do arquivo pessoa
         busca_print(fdin, fdh,tipoBusca);
-        
     }
 
     fclose(fdin);

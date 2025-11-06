@@ -13,15 +13,23 @@ void ORDER_BY(char* arquivoEntrada, char* arquivoSaida){
 
     FILE *fdin = fopen(arquivoEntrada, "rb+"); // abrindo o arquivo para ler os dados
     if(fdin == NULL){
-        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
+        printf("Falha no processamento do arquivo entrada.\n");// verificando se o arquivo foi aberto corretamente
         return;
     }
 
-    FILE *fdout = fopen(arquivoSaida, "wb"); // abrindo o arquivo para a escrita binaria no indice
+    FILE *fdout = fopen(arquivoSaida, "wb+"); // abrindo o arquivo para a escrita binaria
     if(fdout == NULL){
-        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
+        printf("Falha no processamento do arquivo saida.\n");// verificando se o arquivo foi aberto corretamente
         return;
     }
+
+    FILE *arqOrdenado = fopen(nomeArquivoOrdenado, "wb+");
+    if(arqOrdenado == NULL){
+        puts("Falha no processamento do arquivo.");
+        free(arqOrdenado);
+        return;
+    }
+
 
     headerSegue hs;
     fread(&hs.status,sizeof(char),1,fdin);
@@ -31,17 +39,23 @@ void ORDER_BY(char* arquivoEntrada, char* arquivoSaida){
 
     segue Ps[hs.quantidadePessoas];
     for(int i =0; i<hs.quantidadePessoas;i++){
+
+
         fread(&Ps[i].removido,sizeof(char),1,fdin);
         fread(&Ps[i].idPessoaQueSegue,sizeof(int),1,fdin);
         fread(&Ps[i].idPessoaQueESeguida,sizeof(int),1,fdin);
         Ps[i].dataInicioQueSegue = (char *) malloc(10);
         fread(&Ps[i].dataInicioQueSegue,sizeof(char),10,fdin);
+        Ps[i].dataInicioQueSegue[10] = '\0';
         Ps[i].dataFimQueSegue = (char *) malloc(10);
         fread(&Ps[i].dataFimQueSegue,sizeof(char),10,fdin);
+        Ps[i].dataFimQueSegue[10] = '\0';
         fread(&Ps[i].grauAmizade,sizeof(int),1,fdin);
     }
 
     qsort(Ps,hs.quantidadePessoas,sizeof(segue),comparaSegue);
+
+
 
     fwrite(&hs.status,sizeof(char),1,fdout);
     fwrite(&hs.quantidadePessoas,sizeof(int),1,fdout);

@@ -27,41 +27,46 @@ void SELECT(char *arquivoSaida){
     //printf("offset:%ld\n",h.Offset);
     int qtdePessoas = h.quantidadePessoas;
     int qtdeRemovidos = h.quantidadeRemovidos;
+    char lixo;
     
 
 
     //ler todos os dados das pessoas
     pessoa p;
     //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
-    for(int i = 0; i <qtdePessoas; i++){
-        fread(&p.removido,sizeof(char), 1, fd);
+    
+    fread(&p.removido,sizeof(char), 1, fd);
+    for(int i = 0; i <qtdePessoas+qtdeRemovidos; i++){
         fread(&p.tamanhoRegistro, sizeof(int), 1, fd);
         
-        if(p.removido == '0'){ //registro nao esta marcado como removido
-            
-            fread(&p.idPessoa, sizeof(int), 1, fd);
-            fread(&p.idadePessoa, sizeof(int), 1, fd);
-            fread(&p.tamanhoNomePessoa, sizeof(int), 1, fd);
-            p.nomePessoa = (char *) malloc(p.tamanhoNomePessoa + 1);
-            fread(p.nomePessoa, sizeof(char), p.tamanhoNomePessoa, fd);
-            p.nomePessoa[p.tamanhoNomePessoa] = 0;
-            fread(&p.tamanhoNomeUsuario,sizeof(int), 1, fd);
-            p.nomeUsuario = (char *) malloc(p.tamanhoNomeUsuario+1);
-            fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
-            p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
-
-            print_registro(p);
-            
-            free(p.nomePessoa);
-            free(p.nomeUsuario);
-
-        }else{
-            printf("Registro inexistente\n\n");
-            fseek(fd,p.tamanhoRegistro,SEEK_CUR);
-        }
+        fread(&p.idPessoa, sizeof(int), 1, fd);
+        fread(&p.idadePessoa, sizeof(int), 1, fd);
+        fread(&p.tamanhoNomePessoa, sizeof(int), 1, fd);
+        p.nomePessoa = (char *) malloc(p.tamanhoNomePessoa + 1);
+        fread(p.nomePessoa, sizeof(char), p.tamanhoNomePessoa, fd);
+        p.nomePessoa[p.tamanhoNomePessoa] = 0;
+        fread(&p.tamanhoNomeUsuario,sizeof(int), 1, fd);
+        p.nomeUsuario = (char *) malloc(p.tamanhoNomeUsuario+1);
+        fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
+        p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
+        fread(&lixo,sizeof(char),1,fd);
+        if(lixo=='$'){
+            while(lixo!='1' || lixo!='0'){
+                fread(&lixo,sizeof(char),1,fd);
+                if(lixo!='$'){break;}
+            }
         }
 
-        fclose(fd);
+        if(p.removido == '0'){print_registro(p);} //registro nao esta marcado como removido
+        p.removido=lixo;
+        free(p.nomePessoa);
+        free(p.nomeUsuario);
+
+  
+    }
+        
+
+    fclose(fd);
 
         
 }

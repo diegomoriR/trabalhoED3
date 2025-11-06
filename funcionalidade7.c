@@ -24,7 +24,7 @@ void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
         return;
     }
     int buscas[n];
-    int i, param, k, Ncampo;
+    int i, param, k, Ncampo, pos;
     char tipoBusca[15], campo[15];
     char parametro[30];
     char NcampoString[30];
@@ -34,7 +34,11 @@ void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
     header h;
     pessoa p;
     indice j;
-    
+
+
+    pos=0;
+    INICIO_ARQUIVO(fdin);
+
     for( i=0; i<n;i++){//controle para o número de buscas
 
 
@@ -45,9 +49,11 @@ void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
 
 
         p = busca_int(fdin,fdh,tipoBusca);
+
         scanf("%*c");
         scanf(" %[^=]", campo);
         scanf("%*c");
+        
 
         substitui_registro(fdin,fdh,p,campo);
 

@@ -49,7 +49,7 @@ typedef struct _segue{
 #define TAMANHO_HEADER_INDICE 12
 #define INICIO_ARQUIVO(fd) fseek(fd, 0 , SEEK_SET)
 #define TAMANHO_LINHA 1024
-#define NUMERO_PESSOAS h.quantidadePessoas - h.quantidadeRemovidos
+#define NUMERO_PESSOAS h.quantidadePessoas + h.quantidadeRemovidos
 #define TAMANHO_INDICE 12
 
 void CREATE_INDEX(char *arquivoIndicePrimario);
@@ -67,10 +67,13 @@ void binarioNaTela(char *nomeArquivoBinario);
 void scan_quote_string(char *str);
 void print_registro( pessoa p);
 char* strsep(char** stringp, const char* delim);
-void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char* campo);
+void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo);
 int comparaSegue(const void *a, const void *b);
 pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca);
-int busca_ind(int id, FILE* indices,int inicio, int fim);
+long busca_ind(FILE *fdh, indice novo);
+void inserirIndiceOrdenado(FILE *fdh, indice novo);
+void busca_print(FILE *fd, FILE *fdh, char *tipoBusca);
+
 
 
 
