@@ -14,7 +14,7 @@
 void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 
  int Ncampo;
- char NcampoString[30];
+ char NcampoString[100];
  char lixo = '$';
  header h;
  indice i;
@@ -27,10 +27,21 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 	fseek(fd,h.Offset,SEEK_SET);
 
 	if(strcmp(campo,"nomePessoa")==0){
-	
-		scan_quote_string(NcampoString);
-		int tam = strlen(NcampoString);
-        int dif = p.tamanhoNomePessoa-tam;
+		int tam, dif;
+
+		if(strcmp(NcampoString,"NULO")!=0){
+            //tratando as aspas
+            NcampoString[0]=NcampoString[1];
+            for(int j=0;j<strlen(NcampoString);j++){
+                if(NcampoString[j]=='\"'){NcampoString[j]=0;}
+                else{NcampoString[j]=NcampoString[j+1];}
+            } 
+			tam = strlen(NcampoString);
+		}
+		else{tam=0;}
+		if(p.removido='1'){return;}
+		
+        dif = p.tamanhoNomePessoa-tam;
 
 		if(dif>=0){
 			fseek(fd,8,SEEK_CUR);
@@ -107,9 +118,20 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 
 
 	else if(strcmp(campo,"nomeUsuario")==0){
-		scan_quote_string(NcampoString);
-		int tam = strlen(NcampoString);
-        int dif = p.tamanhoNomeUsuario-tam;
+		int tam, dif;
+
+		if(strcmp(NcampoString,"NULO")!=0){
+            //tratando as aspas
+            NcampoString[0]=NcampoString[1];
+            for(int j=0;j<strlen(NcampoString);j++){
+                if(NcampoString[j]=='\"'){NcampoString[j]=0;}
+                else{NcampoString[j]=NcampoString[j+1];}
+            } 
+			tam = strlen(NcampoString);
+		}
+		else{tam=0;}
+		if(p.removido='1'){return;}
+		dif = p.tamanhoNomeUsuario-tam;
 
 		if(dif>=0){
 			fseek(fd,12+p.tamanhoNomePessoa,SEEK_CUR);
@@ -180,9 +202,14 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 	
 	
 	else if(strcmp(campo,"idPessoa")==0){
-		scanf("%d",&Ncampo);
+		
+		
+		scanf("%s",NcampoString);
+    	if(strcmp(NcampoString,"NULO")==0){Ncampo= -1;}
+        else{Ncampo=atoi(NcampoString);}
+		if(p.removido='1'){return;}
 
-			fwrite(&Ncampo,sizeof(int),1,fd);
+		fwrite(&Ncampo,sizeof(int),1,fd);
 
 		h.status='1';
 		fseek(fd,0,SEEK_SET);
@@ -210,7 +237,10 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 	else if(strcmp(campo,"idadePessoa")==0){
 
 		
-        scanf("%d",&Ncampo);
+		scanf("%s",NcampoString);
+    	if(strcmp(NcampoString,"NULO")==0){Ncampo= -1;}
+        else{Ncampo=atoi(NcampoString);}
+		if(p.removido='1'){return;}
 
 		fseek(fd,4,SEEK_CUR);
         fwrite(&Ncampo,sizeof(int),1,fd);

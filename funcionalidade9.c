@@ -23,23 +23,17 @@ void ORDER_BY(char* arquivoEntrada, char* arquivoSaida){
         return;
     }
 
-    FILE *arqOrdenado = fopen(nomeArquivoOrdenado, "wb+");
-    if(arqOrdenado == NULL){
-        puts("Falha no processamento do arquivo.");
-        free(arqOrdenado);
-        return;
-    }
 
 
+    //lendo o cabeçalho do arquivo
     headerSegue hs;
     fread(&hs.status,sizeof(char),1,fdin);
     fread(&hs.quantidadePessoas,sizeof(int),1,fdin);
     fread(&hs.proxRRN,sizeof(int),1,fdin);
 
-
+    // vetor para os resgistros
     segue Ps[hs.quantidadePessoas];
-    for(int i =0; i<hs.quantidadePessoas;i++){
-
+    for(int i =0; i<hs.quantidadePessoas;i++){//copiando os registros para o vetor
 
         fread(&Ps[i].removido,sizeof(char),1,fdin);
         fread(&Ps[i].idPessoaQueSegue,sizeof(int),1,fdin);
@@ -53,15 +47,15 @@ void ORDER_BY(char* arquivoEntrada, char* arquivoSaida){
         fread(&Ps[i].grauAmizade,sizeof(int),1,fdin);
     }
 
-    qsort(Ps,hs.quantidadePessoas,sizeof(segue),comparaSegue);
+    qsort(Ps,hs.quantidadePessoas,sizeof(segue),comparaSegue);//ordenando o vetor
 
 
-
+    //escrevendo o cabeçalho
     fwrite(&hs.status,sizeof(char),1,fdout);
     fwrite(&hs.quantidadePessoas,sizeof(int),1,fdout);
     fwrite(&hs.proxRRN,sizeof(int),1,fdout);
 
-    for(int i =0; i<hs.quantidadePessoas;i++){
+    for(int i =0; i<hs.quantidadePessoas;i++){//escrevendo no arquivo ordenado
     fwrite(&Ps[i].removido,sizeof(char),1,fdout);
     fwrite(&Ps[i].idPessoaQueSegue,sizeof(int),1,fdout);
     fwrite(&Ps[i].idPessoaQueESeguida,sizeof(int),1,fdout);

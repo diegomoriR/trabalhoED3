@@ -248,6 +248,7 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                 }
                 if(b == 0){
                     printf("Registro inexistente.\n\n");
+                    
                 }//nenhum registro encontrado com esse parâmetro
             
             }
@@ -280,15 +281,16 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                     p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
 
                 if(p.idadePessoa == param){//verifica se é o parâmetro buscado
-                        b++;
-                        fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
-                        return p;
-                }
+                    b++;
+                    fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
+                    return p;
                 }else{
-                    fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
                     free(p.nomePessoa);
-                    free(p.nomeUsuario);}
+                    free(p.nomeUsuario);
                 }
+                }else{fseek(fd, p.tamanhoRegistro, SEEK_CUR);}//registro removido, vai para o próximo
+
+            }
             if(b == 0){
                 printf("Registro inexistente.\n\n");
             }//nenhum registro encontrado com esse parâmetro
@@ -334,13 +336,15 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                     b++;
                     fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
                     return p;
-            
-            }
+                }
+                else{
+                    free(p.nomePessoa);
+                    free(p.nomeUsuario);
+                }
             
             }else{
                 fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
-                free(p.nomePessoa);
-                free(p.nomeUsuario);}
+}
             }
             }
             
@@ -369,14 +373,15 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                     fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
                     return p;
             
-            }
+                }
+                else{
+                    free(p.nomePessoa);
+                    free(p.nomeUsuario);
+                }
             
-            }
-            
-            else{
+            }else{
                 fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
-                free(p.nomePessoa);
-                free(p.nomeUsuario);}
+            }
             }
             }
             
@@ -423,14 +428,16 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                     fread(p.nomeUsuario, sizeof(char), p.tamanhoNomeUsuario, fd);
                     p.nomeUsuario[p.tamanhoNomeUsuario] = 0;
 
-                    if(strcmp(parametro,p.nomeUsuario) == 0){//verifica se é o parâmetro buscado
-                        b++;
-                        fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
-                        return p;
-                    }
-                }else{fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
+                if(strcmp(parametro,p.nomeUsuario) == 0){//verifica se é o parâmetro buscado
+                    b++;
+                    fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
+                    return p;
+                }
+                else{
                     free(p.nomePessoa);
-                    free(p.nomeUsuario);}
+                    free(p.nomeUsuario);
+                }
+                }else{fseek(fd, p.tamanhoRegistro, SEEK_CUR);}//registro removido, vai para o próximo
             }
             }else{
                 
@@ -457,14 +464,14 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                     fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
                     return p;
             
-            }
-            
-            }
-            
-            else{
+                }
+                else{
+                    free(p.nomePessoa);
+                    free(p.nomeUsuario);
+                }
+            }else{
                 fseek(fd, p.tamanhoRegistro, SEEK_CUR);//registro removido, vai para o próximo
-                free(p.nomePessoa);
-                free(p.nomeUsuario);}
+            }
             }
             }
             
@@ -473,44 +480,47 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                 printf("Registro inexistente.\n\n");
             }//nenhum registro encontrado com esse parâmetro
         }
+        p.removido='1';
+        return p;
 }
 
 long busca_ind(FILE *fdh, indice novo){
 
-    if (fdh == NULL) exit(-1);
+    if (fdh == NULL) exit(-1);//arquivo não encontrado
     fseek(fdh, 0, SEEK_END);
-    long tamanhoArquivo = ftell(fdh);
+    long tamanhoArquivo = ftell(fdh);//pega o tamanho do arquivo
     const long inicioRegistros = 12;
-    int n = (tamanhoArquivo - inicioRegistros) / (sizeof(int) + sizeof(long));
+    int n = (tamanhoArquivo - inicioRegistros) / (sizeof(int) + sizeof(long));//calcula o número de registros
 
-    indice VetInd[n];
+    indice VetInd[n];//cria um vetor para ler os indices
     headerIndice hi;
     fseek(fdh, 0, SEEK_SET);
     fread(&hi.status,sizeof(char),1,fdh);
     fseek(fdh, inicioRegistros ,SEEK_SET);
 
-    for(int i=0;i<n;i++){
+    for(int i=0;i<n;i++){//copia os indices para o vetor
         fread(&VetInd[i].idPessoa,sizeof(int),1,fdh);
         fread(&VetInd[i].Offset,sizeof(long),1,fdh);
     }
 
+    //busca binaria
     int ini = 0, fim = n - 1, meio, pos = n;
     indice temp;
     while (ini <= fim) {
-        meio = (ini + fim) / 2;
+        meio = (ini + fim) / 2;//calcula o meio
         if (VetInd[meio].idPessoa == novo.idPessoa) {
-            pos = meio;
+            pos = meio;//caso é o indice buscado
             break;
         } else if (VetInd[meio].idPessoa > novo.idPessoa) {
             pos = meio;
-            fim = meio - 1;
+            fim = meio - 1;//caso buscar na metade inferior
         } else {
-            ini = meio + 1;
+            ini = meio + 1;//caso buscar na metade superior
         }
     }
-    if (ini > fim) pos = ini;
+    if (ini > fim) pos = ini;//id ainda não existe, retorna uma posição para inserir
     size_t tamanhoRegistro = sizeof(int) + sizeof(long);
-    long destino= (inicioRegistros + (pos * tamanhoRegistro));
+    long destino= (inicioRegistros + (pos * tamanhoRegistro));//retorna posição no arquivo de indices
     return destino;
 
 

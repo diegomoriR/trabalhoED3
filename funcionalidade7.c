@@ -48,14 +48,16 @@ void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
         fseek(fdin, 0, SEEK_SET);//coloca no começo do arquivo pessoa
 
 
-        p = busca_int(fdin,fdh,tipoBusca);
+        p = busca_int(fdin,fdh,tipoBusca);//busca o registro
 
         scanf("%*c");
-        scanf(" %[^=]", campo);
+        scanf(" %[^=]", campo);//qual campo quer substituir
         scanf("%*c");
         
-
-        substitui_registro(fdin,fdh,p,campo);
+        
+        substitui_registro(fdin,fdh,p,campo);//substitui o campo
+        free(p.nomePessoa);
+        free(p.nomeUsuario);
 
         }
 
