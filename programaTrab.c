@@ -58,12 +58,12 @@ char b;
         break;
     case 8:
         scanf("%s", arquivoEntrada);
-        scanf("%s", arquivoIndice);
+        scanf("%s", arquivoSaida);
         CREATE_TABLE_2(arquivoEntrada,arquivoSaida);
         break;
     case 9:
         scanf("%s", arquivoEntrada);
-        scanf("%s", arquivoIndice);
+        scanf("%s", arquivoSaida);
         ORDER_BY(arquivoEntrada,arquivoSaida);
         break;
     case 10:

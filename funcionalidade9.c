@@ -11,19 +11,13 @@
 //funcionalidade 9 ORDER_BY
 void ORDER_BY(char* arquivoEntrada, char* arquivoSaida){
 
-    FILE *fdin = fopen(arquivoEntrada, "rb+"); // abrindo o arquivo para ler os dados
+    FILE *fdin = fopen(arquivoEntrada, "wb+"); // abrindo o arquivo para ler os dados
     if(fdin == NULL){
-        printf("Falha no processamento do arquivo entrada.\n");// verificando se o arquivo foi aberto corretamente
+        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
         return;
     }
 
-    FILE *fdout = fopen(arquivoSaida, "wb+"); // abrindo o arquivo para a escrita binaria
-    if(fdout == NULL){
-        printf("Falha no processamento do arquivo saida.\n");// verificando se o arquivo foi aberto corretamente
-        return;
-    }
-
-    FILE *arqOrdenado = fopen(nomeArquivoOrdenado, "wb+");
+    FILE *arqOrdenado = fopen(arquivoSaida, "wb+");
     if(arqOrdenado == NULL){
         puts("Falha no processamento do arquivo.");
         free(arqOrdenado);
@@ -57,25 +51,23 @@ void ORDER_BY(char* arquivoEntrada, char* arquivoSaida){
 
 
 
-    fwrite(&hs.status,sizeof(char),1,fdout);
-    fwrite(&hs.quantidadePessoas,sizeof(int),1,fdout);
-    fwrite(&hs.proxRRN,sizeof(int),1,fdout);
+    fwrite(&hs.status,sizeof(char),1,arqOrdenado);
+    fwrite(&hs.quantidadePessoas,sizeof(int),1,arqOrdenado);
+    fwrite(&hs.proxRRN,sizeof(int),1,arqOrdenado);
 
     for(int i =0; i<hs.quantidadePessoas;i++){
-    fwrite(&Ps[i].removido,sizeof(char),1,fdout);
-    fwrite(&Ps[i].idPessoaQueSegue,sizeof(int),1,fdout);
-    fwrite(&Ps[i].idPessoaQueESeguida,sizeof(int),1,fdout);
-    fwrite(&Ps[i].dataInicioQueSegue,sizeof(char),10,fdout);
+    fwrite(&Ps[i].removido,sizeof(char),1,arqOrdenado);
+    fwrite(&Ps[i].idPessoaQueSegue,sizeof(int),1,arqOrdenado);
+    fwrite(&Ps[i].idPessoaQueESeguida,sizeof(int),1,arqOrdenado);
+    fwrite(&Ps[i].dataInicioQueSegue,sizeof(char),10,arqOrdenado);
     free(Ps[i].dataInicioQueSegue);
-    fwrite(&Ps[i].dataFimQueSegue,sizeof(char),10,fdout);
+    fwrite(&Ps[i].dataFimQueSegue,sizeof(char),10,arqOrdenado);
     free(Ps[i].dataFimQueSegue);
-    fwrite(&Ps[i].grauAmizade,sizeof(int),1,fdout);
+    fwrite(&Ps[i].grauAmizade,sizeof(int),1,arqOrdenado);
     }
 
     
     fclose(fdin);
-    fclose(fdout);
+    fclose(arqOrdenado);
     binarioNaTela(arquivoSaida);
-
-
 }

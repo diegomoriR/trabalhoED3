@@ -71,7 +71,7 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                     }//vai para o próximo id no arquivo indice
                 }
                 if(b == 0){
-                    printf("Registro inexistente.\n\n");
+                    // printf("Registro inexistente.\n\n");
                 }//nenhum registro encontrado com esse parâmetro
             }
             }
@@ -111,7 +111,7 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                     free(p.nomeUsuario);}
                 }
             if(b == 0){
-                printf("Registro inexistente.\n\n");
+                // printf("Registro inexistente.\n\n");
             }//nenhum registro encontrado com esse parâmetro
         }
 
@@ -150,7 +150,7 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                 free(p.nomeUsuario);}
             }
             if(b==0){
-                printf("Registro inexistente.\n\n");
+                // printf("Registro inexistente.\n\n");
             }//nenhum registro encontrado com esse parâmetro
         }
 
@@ -189,7 +189,7 @@ pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca){
                     free(p.nomeUsuario);}
             }
             if(b==0){
-                printf("Registro inexistente.\n\n");
+                // printf("Registro inexistente.\n\n");
             }//nenhum registro encontrado com esse parâmetro
 
         }

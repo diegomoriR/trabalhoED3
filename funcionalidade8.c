@@ -11,11 +11,13 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
     //abrindo arquivos para a leitura e escrita
     FILE *fdin = fopen(arquivoEntrada, "r");
     if(fdin == NULL){
-        printf("Falha no processamento do arquivo\n");
+        printf("Falha no processamento do arquivo.\n");
+        return;
     }
-    FILE *fdout = fopen(arquivoSaida, "wb");
+    FILE *fdout = fopen(arquivoSaida, "wb+");
     if(fdout == NULL){
-        printf("Falha no processamento do arquivo\n");
+        printf("Falha no processamento do arquivo.\n");
+        return;
     }
 
     //criar cabecalho do arquivo de dados segue
@@ -114,4 +116,5 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
     fclose(fdin);
     fclose(fdout);
 
+    binarioNaTela(arquivoSaida);
 }
