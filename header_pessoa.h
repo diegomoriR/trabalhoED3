@@ -51,6 +51,7 @@ typedef struct _segue{
 #define TAMANHO_LINHA 1024
 #define NUMERO_PESSOAS h.quantidadePessoas + h.quantidadeRemovidos
 #define TAMANHO_INDICE 12
+#define NUMERO_RRN hs.proxRRN
 
 void CREATE_INDEX(char *arquivoIndicePrimario);
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario);
@@ -61,6 +62,7 @@ void INSERT_INTO( char *arquivoSaida, char *arquivoIndicePrimario, int NInsert);
 void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n);
 void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida);
 void ORDER_BY(char* arquivoEntrada, char* arquivoSaida);
+void JUNCAO(char *arquivoEntrada, char *arquivoIndicePrimario, char * arquivoOrdenado);
 
 
 void binarioNaTela(char *nomeArquivoBinario);
@@ -69,8 +71,9 @@ void print_registro( pessoa p);
 char* strsep(char** stringp, const char* delim);
 void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo);
 int comparaSegue(const void *a, const void *b);
-pessoa busca_int(FILE *fd, FILE *fdh, char *tipoBusca);
-long busca_ind(FILE *fdh, indice novo);
+pessoa* busca(FILE *fd, FILE *fdh, char *tipoBusca);
+segue* busca_binaria(segue *vetor, int tamanho, int idBusca);
+indice* busca_binaria_indice(indice* vetor, int n, int valor);
 void inserirIndiceOrdenado(FILE *fdh, indice novo);
 void busca_print(FILE *fd, FILE *fdh, char *tipoBusca);
 
@@ -79,6 +82,7 @@ void busca_print(FILE *fd, FILE *fdh, char *tipoBusca);
 
 
 #endif
+
 
 
 
