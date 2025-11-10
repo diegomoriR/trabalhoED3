@@ -13,7 +13,7 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
     if(fdin == NULL){
         printf("Falha no processamento do arquivo\n");
     }
-    FILE *fdout = fopen(arquivoSaida, "wb");
+    FILE *fdout = fopen(arquivoSaida, "wb+");
     if(fdout == NULL){
         printf("Falha no processamento do arquivo\n");
     }
@@ -34,51 +34,50 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
 
     segue s;
     char linha[TAMANHO_LINHA]; // linha para ler os dados
+    INICIO_ARQUIVO(fdin);
     fgets(linha, TAMANHO_LINHA, fdin);//pula linha do arquivo csv
     while(fgets(linha, TAMANHO_LINHA, fdin) != NULL){ // ler as linhas ate o final do arquivo csv
         char *str1;
         char *pointer = linha;
 
     //idPessoaQueSegue
-        str1 = strsep(&pointer, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 != NULL){
             s.idPessoaQueSegue = atoi(str1);
         }else{
             s.idPessoaQueSegue = -1;
         }
-        //printf("id:%d\n",p.idPessoa);
     //idPessoaQueESeguida
-        str1 = strsep(&pointer, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 !=NULL){
             s.idPessoaQueESeguida = atoi(str1);
         }else{
             s.idPessoaQueESeguida = -1;
         }
         //dataInicioQueSegue
-        str1 = strsep(&pointer, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 != NULL){
-            char dataInicio[10];
+            char dataInicio[20];
             strcpy(dataInicio, str1);
             s.dataInicioQueSegue = strdup(dataInicio);
-        }else{
-            for(int i = 0; i < 9; i++){
-                s.dataInicioQueSegue[i] = '$';
-            }
         }
         //dataFimQueSegue
-        str1 = strsep(&pointer, ",");
-        if(str1 != NULL){
-            char dataFim[10];
-            strcpy(dataFim, str1);
-            s.dataFimQueSegue = strdup(dataFim);
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL && str1[0] != '\0'){
+            char dataFim1[11];
+            strcpy(dataFim1, str1);
+            s.dataFimQueSegue = strdup(dataFim1);
         }else{
-            for(int i = 0; i < 9; i++){
-                s.dataFimQueSegue[i] = '$';
-            }
+            s.dataFimQueSegue = malloc(11 * sizeof(char));
+            strcpy(s.dataFimQueSegue, "$$$$$$$$$$$");
         }
         //grauAmizade
-        str1 = strsep(&pointer, ",");
-        if(str1 != NULL){
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL) {
+        //retira \r
+    while (*str1 == ' ' || *str1 == '\n' || *str1 == '\r') str1++;
+}
+        if(str1 != NULL && str1[0] != '\0'){
             s.grauAmizade = *str1;
         }else{
             s.grauAmizade = '$';
@@ -97,13 +96,12 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
         fwrite(&s.grauAmizade, sizeof(char), 1, fdout);
     //mais um segue inserida
         hs.quantidadePessoas++;
+        hs.proxRRN++;
     }
 
     //atualizando cabecalho do arquivo segue
     fseek(fdout, 1, SEEK_SET);
     fwrite(&hs.quantidadePessoas, sizeof(int), 1, fdout);
-    fseek(fdout, 0, SEEK_END);
-    hs.proxRRN = ftell(fdout);
     fseek(fdout, 5, SEEK_SET);
     fwrite(&hs.proxRRN, sizeof(int), 1, fdout);
     hs.status = '1'; //status consistente
@@ -113,5 +111,7 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
     //fechar os arquivos
     fclose(fdin);
     fclose(fdout);
+
+    binarioNaTela(arquivoSaida);
 
 }
