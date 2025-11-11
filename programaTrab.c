@@ -10,7 +10,6 @@ int funcionalidade, vezes;
 char arquivoEntrada[30];
 char arquivoSaida[30];
 char arquivoIndice[30];
-char b;
 
 
     

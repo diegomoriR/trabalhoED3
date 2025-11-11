@@ -24,40 +24,27 @@ void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n){
         return;
     }
     int buscas[n];
-    int i, param, k, Ncampo, pos;
-    char tipoBusca[15], campo[15];
-    char parametro[30];
-    char NcampoString[30];
-
-    // criando headers e pessoas pra facilitar a manipulação de dados
-    headerIndice hi;
-    header h;
-    pessoa p;
-    indice j;
+    int i;
+    char tipoBusca[15];
 
 
-    pos=0;
+ 
+
+
+
     INICIO_ARQUIVO(fdin);
 
     for( i=0; i<n;i++){//controle para o número de buscas
 
 
         scanf("%d",&buscas[i]);//numero da busca com o parametro
-        scanf(" %[^=]", tipoBusca);
         scanf("%*c");
+        scanf(" %[^=]", tipoBusca);//tipo de busca
+        printf("\n%s\n",tipoBusca);
         fseek(fdin, 0, SEEK_SET);//coloca no começo do arquivo pessoa
 
 
-        p = busca_int(fdin,fdh,tipoBusca);//busca o registro
-
-        scanf("%*c");
-        scanf(" %[^=]", campo);//qual campo quer substituir
-        scanf("%*c");
-        
-        
-        substitui_registro(fdin,fdh,p,campo);//substitui o campo
-        free(p.nomePessoa);
-        free(p.nomeUsuario);
+         busca_substitui(fdin,fdh,tipoBusca);//busca o registro
 
         }
 

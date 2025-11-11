@@ -33,17 +33,17 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
         INICIO_ARQUIVO(fd); //coloca no começo do arquivo pessoa
 
         //puxando o indice para a RAM
-        indice *indices = (indice *)malloc(NUMERO_PESSOAS * sizeof(indice));
+        indice *indices = vetor_ind(fdh);
         //lendo o indice para a RAM
-        fread(indices, sizeof(indice), NUMERO_PESSOAS, fdh);
 
         //busca a pessoa p
         p = busca(fd, fdh, tipoBusca);
         if(p != NULL){
             //busca binaria no arquivo de indice para descobrir o offset para a remocao
-            i = busca_binaria_indice(indices, NUMERO_PESSOAS, p->idPessoa);
+           
 
-            long Offset = i->Offset;
+            long Offset = busca_binaria_indice(indices, NUMERO_PESSOAS, p->idPessoa);
+
 
             //remover no arquivo pessoa
             fseek(fd, Offset, SEEK_SET);

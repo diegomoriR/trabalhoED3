@@ -11,29 +11,39 @@
 
 
 
-void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
+void substitui_registro(FILE* fd, FILE* fdh,  pessoa p){
 
  int Ncampo;
  char NcampoString[100];
  char lixo = '$';
  header h;
  indice i;
-				
+ indice* ibusca;
+ char *campo;
+			
+        scanf("%*c");
+        scanf(" %[^=]", campo);//qual campo quer substituir
+        scanf("%*c");
+		
 
 	h.Offset=ftell(fd);
 	h.status='0';
 	fseek(fd,0,SEEK_SET);
 	fwrite(&h.status,sizeof(char),1,fd);
 	fseek(fd,h.Offset,SEEK_SET);
+	fseek(fd,-p.tamanhoRegistro,SEEK_CUR);
 
 	if(strcmp(campo,"nomePessoa")==0){
 		int tam, dif;
-
-		if(strcmp(NcampoString,"NULO")!=0){
+		scanf("%s",NcampoString);
+		if(strcmp(NcampoString,"NULO")!=0){//confere se é nulo
             //tratando as aspas
             NcampoString[0]=NcampoString[1];
             for(int j=0;j<strlen(NcampoString);j++){
-                if(NcampoString[j]=='\"'){NcampoString[j]=0;}
+                if(NcampoString[j]=='\"'){
+					NcampoString[j]=0;
+					break;
+				}
                 else{NcampoString[j]=NcampoString[j+1];}
             } 
 			tam = strlen(NcampoString);
@@ -41,15 +51,15 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 		else{tam=0;}
 		if(p.removido='1'){return;}
 		
-        dif = p.tamanhoNomePessoa-tam;
+        dif = p.tamanhoNomePessoa-tam;//calcula a difereença de tamanho
 
-		if(dif>=0){
+		if(dif>=0){//se cabe no registro
 			fseek(fd,8,SEEK_CUR);
 			fwrite(&tam,sizeof(int),1,fd);
-			fwrite(NcampoString,sizeof(char),tam,fd);
+			fwrite(NcampoString,sizeof(char),tam,fd);//escreve o novo campo
 			fwrite(&p.tamanhoNomeUsuario,sizeof(int),1,fd);
 			fwrite(p.nomeUsuario,sizeof(char),p.tamanhoNomeUsuario,fd);
-            for(int k = 0; k < dif; k++) {
+            for(int k = 0; k < dif; k++) {//completa com lixo
               fwrite(&lixo, sizeof(char), 1, fd);
             }
 
@@ -58,13 +68,13 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 			fwrite(&h.status,sizeof(char),1,fd);
 		}
 
-		else if(dif<0){
+		else if(dif<0){//se não cabe no registro
 			p.removido='1';
 			p.tamanhoNomePessoa = tam;
-			strcpy(p.nomePessoa,NcampoString);
-			p.tamanhoRegistro = 16 + p.tamanhoNomePessoa + p.tamanhoNomeUsuario;
+			strcpy(p.nomePessoa,NcampoString);//copia o novo nome para a struct
+			p.tamanhoRegistro = 16 + p.tamanhoNomePessoa + p.tamanhoNomeUsuario;//calcula o tamanho do novo registro
             fseek(fd,-(sizeof(char)+sizeof(int)),SEEK_CUR);
-			fwrite(&p.removido,sizeof(char),1,fd);
+			fwrite(&p.removido,sizeof(char),1,fd);//marca o registro como removido
 
 
 			fseek(fd,0,SEEK_SET);
@@ -73,7 +83,7 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 			fread(&h.quantidadeRemovidos,sizeof(int),1,fd);
 			fseek(fd,-sizeof(int),SEEK_CUR);
 			h.quantidadeRemovidos++;
-			fwrite(&h.quantidadeRemovidos,sizeof(int),1,fd);
+			fwrite(&h.quantidadeRemovidos,sizeof(int),1,fd);//aumenta o número de resolvidos 
 
 
 			fseek(fd,0,SEEK_END);
@@ -103,10 +113,12 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 			h.status='0';
 			fwrite(&h.status,sizeof(char),1,fdh);
             i.idPessoa=p.idPessoa;
-			long offsetIndice = busca_ind(fdh,i);
+			ibusca=vetor_ind(fdh);
+			long offsetIndice = busca_binaria_indice(ibusca,h.quantidadePessoas,i.idPessoa);
             fseek(fdh,offsetIndice,SEEK_SET);
 			fread(&i.idPessoa,sizeof(int),1,fdh);
 			fwrite(&offset,sizeof(long),1,fdh);
+			free(ibusca);
 
 			h.status='1';
 			fseek(fdh,0,SEEK_SET);
@@ -119,12 +131,15 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 
 	else if(strcmp(campo,"nomeUsuario")==0){
 		int tam, dif;
-
+		scanf("%s",NcampoString);
 		if(strcmp(NcampoString,"NULO")!=0){
             //tratando as aspas
             NcampoString[0]=NcampoString[1];
             for(int j=0;j<strlen(NcampoString);j++){
-                if(NcampoString[j]=='\"'){NcampoString[j]=0;}
+                if(NcampoString[j]=='\"'){
+					NcampoString[j]=0;
+					break;
+				}
                 else{NcampoString[j]=NcampoString[j+1];}
             } 
 			tam = strlen(NcampoString);
@@ -189,10 +204,12 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 			h.status='0';
 			fwrite(&h.status,sizeof(char),1,fdh);
             i.idPessoa=p.idPessoa;
-			long offsetIndice = busca_ind(fdh,i);
+			ibusca=vetor_ind(fdh);
+			long offsetIndice = busca_binaria_indice(ibusca,h.quantidadePessoas,i.idPessoa);
             fseek(fdh,offsetIndice,SEEK_SET);
 			fread(&i.idPessoa,sizeof(int),1,fdh);
 			fwrite(&offset,sizeof(long),1,fdh);
+			free(ibusca);
 
 			h.status='1';
 			fseek(fdh,0,SEEK_SET);
@@ -220,7 +237,8 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 		fwrite(&h.status,sizeof(char),1,fdh);
 		fseek(fdh,TAMANHO_INDICE,SEEK_SET);
         i.idPessoa=p.idPessoa;
-		i.Offset = busca_ind(fdh,i);
+		ibusca=vetor_ind(fdh);
+		i.Offset = busca_binaria_indice(ibusca,h.quantidadePessoas,i.idPessoa);
         fseek(fdh,i.Offset,SEEK_SET);
 		fwrite(&Ncampo,sizeof(int),1,fdh);
         fseek(fdh,-sizeof(int),SEEK_CUR);
@@ -230,6 +248,7 @@ void substitui_registro(FILE* fd, FILE* fdh,  pessoa p,char *campo){
 		fseek(fdh,0,SEEK_SET);
 		h.status='1';
 		fwrite(&h.status,sizeof(char),1,fdh);
+		free(ibusca);
 		
 	}
 	
