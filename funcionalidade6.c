@@ -74,11 +74,12 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
         
     //nome Pessoa
         scanf("%*c");
+        scanf("%*c");
         scan_quote_string(l);
         if(strcmp(l,"NULO")!=0 && strlen(l) > 0){
             // Remover o caractere de nova linha, se presente
             size_t len = strlen(l);
-            if (len > 0 && (l[len-1] == '\n' || l[len-1] == '\r')) {
+            if (len > 0 && (l[len-1] == '\n' || l[len-1] == '\r'|| l[len-1] == '\"')) {
                 l[len-1] = '\0';
                 len--;
             }
@@ -100,6 +101,7 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
        
     //idade Pessoa
         scanf("%*c");
+        scanf("%*c");
         scanf("%[^,]", l);
         if(strcmp(l,"NULO")!=0 && strlen(l) > 0){
             p.idadePessoa = atoi(l);
@@ -109,11 +111,12 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
     
     //nome Usuario
         scanf("%*c");
+        scanf("%*c");
         scan_quote_string(l);
         if(strcmp(l,"NULO")!=0 && strlen(l) > 0){
             // Remover o caractere de nova linha, se presente
             size_t len = strlen(l);
-            if (len > 0 && (l[len-1] == '\n' || l[len-1] == '\r')) {
+            if (len > 0 && (l[len-1] == '\n' || l[len-1] == '\r'|| l[len-1] == '\"')) {
                 l[len-1] = '\0';
                 len--;
             }
@@ -145,7 +148,8 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
         fwrite(&tamNomeUsuario, sizeof(int), 1, fdout);
         if(tamNomeUsuario != 0){
         fwrite(p.nomeUsuario, sizeof(char), tamNomeUsuario, fdout);
-
+        free(p.nomePessoa);
+        free(p.nomeUsuario);
         }
     //mais uma pessoa inserida
         hp.quantidadePessoas++;
@@ -167,6 +171,8 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
     hp.status = '1'; //status consistente
     fwrite(&hp.status, sizeof(char), 1, fdout);
     fwrite(&hp.quantidadePessoas, sizeof(int), 1, fdout);
+    fwrite(&hp.quantidadeRemovidos,sizeof(int),1,fdout);
+    fwrite(&hp.Offset,sizeof(long),1,fdout);
 
 
     //atualizando cabecalho do arquivo de indice
