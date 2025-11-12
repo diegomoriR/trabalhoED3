@@ -11,11 +11,13 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
     //abrindo arquivos para a leitura e escrita
     FILE *fdin = fopen(arquivoEntrada, "r");
     if(fdin == NULL){
-        printf("Falha no processamento do arquivo\n");
+        printf("Falha no processamento do arquivo.\n");
+        return;
     }
     FILE *fdout = fopen(arquivoSaida, "wb+");
     if(fdout == NULL){
-        printf("Falha no processamento do arquivo\n");
+        printf("Falha no processamento do arquivo.\n");
+        return;
     }
 
     //criar cabecalho do arquivo de dados segue
@@ -41,28 +43,28 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
         char *pointer = linha;
 
     //idPessoaQueSegue
-        str1 = strsep(&pointer, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 != NULL){
             s.idPessoaQueSegue = atoi(str1);
         }else{
             s.idPessoaQueSegue = -1;
         }
     //idPessoaQueESeguida
-        str1 = strsep(&pointer, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 !=NULL){
             s.idPessoaQueESeguida = atoi(str1);
         }else{
             s.idPessoaQueESeguida = -1;
         }
         //dataInicioQueSegue
-        str1 = strsep(&pointer, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 != NULL){
             char dataInicio[20];
             strcpy(dataInicio, str1);
             s.dataInicioQueSegue = strdup(dataInicio);
         }
         //dataFimQueSegue
-        str1 = strsep(&pointer, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 != NULL && str1[0] != '\0'){
             char dataFim1[11];
             strcpy(dataFim1, str1);
@@ -72,7 +74,7 @@ void CREATE_TABLE_2(char *arquivoEntrada, char *arquivoSaida){
             strcpy(s.dataFimQueSegue, "$$$$$$$$$$$");
         }
         //grauAmizade
-        str1 = strsep(&pointer, ",");
+        str1 = mystrsep(&pointer, ",");
         if(str1 != NULL) {
         //retira \r
     while (*str1 == ' ' || *str1 == '\n' || *str1 == '\r') str1++;
