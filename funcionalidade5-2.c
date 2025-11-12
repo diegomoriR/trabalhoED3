@@ -33,7 +33,19 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
         INICIO_ARQUIVO(fd); //coloca no começo do arquivo pessoa
 
         //puxando o indice para a RAM
-        indice *indices = vetor_ind(fdh);
+        fseek(fdh, 0, SEEK_END);
+        long tamanhoArquivo = ftell(fdh);//pega o tamanho do arquivo
+        const long inicioRegistros = 12;
+        int n = (tamanhoArquivo - inicioRegistros) / (sizeof(int) + sizeof(long));//calcula o número de registros
+        indice indices[n];
+        headerIndice hi;
+        fseek(fdh, 0, SEEK_SET);
+        fread(&hi.status,sizeof(char),1,fdh);
+        fseek(fdh, TAMANHO_HEADER_INDICE ,SEEK_SET);
+        for(int i=0;i<n;i++){//copia os indices para o vetor
+            fread(&indices[i].idPessoa,sizeof(int),1,fdh);
+            fread(&indices[i].Offset,sizeof(long),1,fdh);
+        }
         //lendo o indice para a RAM
 
         //busca a pessoa p
@@ -61,7 +73,6 @@ void DELETE(char *arquivoEntrada, char *arquivoIndicePrimario, int n){
             INICIO_ARQUIVO(fdh);
             hi.status = '0';
             fwrite(&hi.status, sizeof(char), 1, fdh);
-
             fseek(fdh, 12, SEEK_SET);
             fwrite(indices, sizeof(indice), NUMERO_PESSOAS, fdh);
 

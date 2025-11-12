@@ -175,27 +175,10 @@ int comparaSegue(const void *a, const void *b) {
     return 0;
 }
 
-
-indice* vetor_ind(FILE *fdh){
-
-    if (fdh == NULL) exit(-1);//arquivo não encontrado
-    fseek(fdh, 0, SEEK_END);
-    long tamanhoArquivo = ftell(fdh);//pega o tamanho do arquivo
-    const long inicioRegistros = 12;
-    int n = (tamanhoArquivo - inicioRegistros) / (sizeof(int) + sizeof(long));//calcula o número de registros
-
-    indice* VetInd = (indice *)malloc(n * sizeof(indice));
-    headerIndice hi;
-    fseek(fdh, 0, SEEK_SET);
-    fread(&hi.status,sizeof(char),1,fdh);
-    fseek(fdh, inicioRegistros ,SEEK_SET);
-
-    for(int i=0;i<n;i++){//copia os indices para o vetor
-        fread(&VetInd[i].idPessoa,sizeof(int),1,fdh);
-        fread(&VetInd[i].Offset,sizeof(long),1,fdh);
-    }
-    return VetInd;
-
+int compara_indice(const void *a, const void *b) {
+    indice *ia = (indice *)a;
+    indice *ib = (indice *)b;
+    return (ia->idPessoa - ib->idPessoa);
 }
 
 void inserirIndiceOrdenado(FILE *fdh, indice novo){

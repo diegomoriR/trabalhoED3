@@ -69,16 +69,15 @@ void binarioNaTela(char *nomeArquivoBinario);
 void scan_quote_string(char *str);
 void print_registro( pessoa p);
 char* strsep(char** stringp, const char* delim);
-void substitui_registro(FILE* fd, FILE* fdh,  pessoa p);
+void substitui_registro(FILE *fd, FILE *fdh, pessoa p, long offsetP, indice* VetInd);
 int comparaSegue(const void *a, const void *b);
+int compara_indice(const void *a, const void *b);
 pessoa* busca(FILE *fd, FILE *fdh, char *tipoBusca);
 segue* busca_binaria(segue *vetor, int tamanho, int idBusca);
 long busca_binaria_indice(indice* vetor, int n, int valor);
-indice* vetor_ind(FILE *fdh);
 void inserirIndiceOrdenado(FILE *fdh, indice novo);
-void busca_print(FILE *fd, FILE *fdh, char *tipoBusca);
-void busca_substitui(FILE *fd, FILE *fdh, char *tipoBusca);
-
+void busca_print(FILE *fd, FILE *fdh);
+int busca_binaria_indice_atualiza(indice* vetor, int n, int valor);
 
 
 

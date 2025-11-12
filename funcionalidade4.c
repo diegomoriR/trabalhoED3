@@ -24,25 +24,13 @@ void Select_Where(char* arquivoEntrada, char* arquivoIndice, int n){
         printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
         return;
     }
-    int buscas[n];
-    int i,b, param, k;
-    char tipoBusca[15];
-    char parametro[30];
 
-    // criando headers e pessoas pra facilitar a manipulação de dados
-    headerIndice hi;
-    header h;
-    pessoa p;
-    indice j;
     
-    for( i=0; i<n;i++){//controle para o número de buscas
+    for( int i=0; i<n;i++){//controle para o número de buscas
 
 
-        scanf("%d",&buscas[i]);//numero da busca com o parametro
-        scanf(" %[^=]", tipoBusca);
-        scanf("%*c");
         fseek(fdin, 0, SEEK_SET);//coloca no começo do arquivo pessoa
-        busca_print(fdin, fdh,tipoBusca);
+        busca_print(fdin, fdh);
     }
 
     fclose(fdin);
