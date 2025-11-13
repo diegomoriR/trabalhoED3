@@ -1,7 +1,3 @@
-//Lucas Soares Leite Santos - 15472162
-//Diego Mori Rodrigues - 13782421
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,24 +5,19 @@
 
 
 
-
-
 //funcionalidade 2 (CREATE TABLE)
 void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndicePrimario){
     FILE *fdin = fopen(arquivoEntrada, "r"); // abrindo o arquivo para ler os dados
     if(fdin == NULL){
-        printf("Falha no processamento do arquivo.\n");
-        return;// verificando se o arquivo foi aberto corretamente
+        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
     }
     FILE *fdout = fopen(arquivoSaida, "wb"); // abrindo o arquivo para a escrita binaria no arquivo de dados
     if(fdout == NULL){
-        printf("Falha no processamento do arquivo.\n");
-        return;// verificando se o arquivo foi aberto corretamente
+        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
     }
-    FILE *fdh = fopen(arquivoIndicePrimario, "rb+"); // abrindo o arquivo para a escrita binaria no indice
+    FILE *fdh = fopen(arquivoIndicePrimario, "wb+"); // abrindo o arquivo para a escrita binaria no indice
     if(fdh == NULL){
-        printf("Falha no processamento do arquivo.\n");
-        return;// verificando se o arquivo foi aberto corretamente
+        printf("Falha no processamento do arquivo.\n");// verificando se o arquivo foi aberto corretamente
     }
 
     //criar cabecalho do arquivo de dados pessoa e status inconsistente
@@ -44,92 +35,71 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
     headerIndice hi;
     INICIO_ARQUIVO(fdh);
     fread(&hi.status, sizeof(char), 1, fdh);
-    if(hi.status=='0'){printf("arquivo indice inconsistente");
-    return;}
-
     hi.status = '0'; //status incosistente
     INICIO_ARQUIVO(fdh);
     fwrite(&hi.status, sizeof(char), 1, fdh);
-    for(int i = 0; i < TAMANHO_INDICE - 1; i++){
-        fputc('$', fdh);
-    }
+    fseek(fdh, 12, SEEK_SET);
+
     //Ler os dados do arquivo csv
     //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
     pessoa p;
-    char l[TAMANHO_LINHA]; // linha para ler os dados
-
-    fgets(l, TAMANHO_LINHA, fdin);//pula linha do arquivo csv
-    while(fgets(l, TAMANHO_LINHA, fdin) != NULL){ // ler as linhas ate o final do arquivo csv
-        
-        if (l[0] == '\n' || l[0] == '\r' || l[0] == '\0') {
-        continue;
-    }
-        char* str1;
-        char* linha = l;
+    char linha[TAMANHO_LINHA]; // linha para ler os dados
+    fgets(linha, TAMANHO_LINHA, fdin);//pula linha do arquivo csv
+    while(fgets(linha, TAMANHO_LINHA, fdin) != NULL){ // ler as linhas ate o final do arquivo csv
+        char *str1;
+        char *pointer = linha;
         int tamNomePessoa;
         int tamNomeUsuario;
 
     //id Pessoa
-        str1 = strsep(&linha, ",");
-        
-        if(str1 != NULL && strlen(str1) > 0){
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL){
             p.idPessoa = atoi(str1);
         }else{
             p.idPessoa = -1;
         }
-        
+        //printf("id:%d\n",p.idPessoa);
     //nome Pessoa
-        str1 = strsep(&linha,",");
-        if(str1 != NULL && strlen(str1) > 0){
-            // Remover o caractere de nova linha, se presente
-            size_t len = strlen(str1);
-            if (len > 0 && (str1[len-1] == '\n' || str1[len-1] == '\r')) {
-                str1[len-1] = '\0';
-                len--;
-            }
-        // Se a string ainda contiver \r, remova-o também
-        if (len > 0 && str1[len-1] == '\r') {
-            str1[len-1] = '\0';
-            len--;
-        }
-            p.nomePessoa = strdup(str1);
-            tamNomePessoa = len;
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL){
+            char nomePessoa[100];
+            strcpy(nomePessoa, str1);
+            p.nomePessoa = strdup(nomePessoa);
+            //calculando tamanho do campo nome Pessoa
+            tamNomePessoa = strlen(p.nomePessoa);
         }else{
             p.nomePessoa = NULL;
             tamNomePessoa = 0;
         }
-       
+        //printf("nome:%s\n", p.nomePessoa);
+        //printf("tamanho nome:%d\n",tamNomePessoa);
+        //removido -> tamanho registro -> idPessoa -> idadePessoa -> tamanho nomePessoa -> nomePessoa -> tamanho nomeUsuario -> nomeUsuario
     //idade Pessoa
-        str1 = strsep(&linha, ",");
-        if(str1 != NULL && strlen(str1) > 0){
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL && strcmp(str1,"")!=0){
             p.idadePessoa = atoi(str1);
         }else{
             p.idadePessoa = -1;
         }
-    
+        //printf("idade:%d\n", p.idadePessoa);
     //nome Usuario
-        str1 = strsep(&linha, ",");
-        if(str1 != NULL && strlen(str1) > 0){
-            // Remover o caractere de nova linha, se presente
-            size_t len = strlen(str1);
-            if (len > 0 && (str1[len-1] == '\n' || str1[len-1] == '\r')) {
-                str1[len-1] = '\0';
-                len--;
-            }
-        if (len > 0 && str1[len-1] == '\r') {
-            str1[len-1] = '\0';
-            len--;
-        }
-            p.nomeUsuario = strdup(str1);
-            tamNomeUsuario = len;
+        str1 = mystrsep(&pointer, ",");
+        if(str1 != NULL){
+            char nomeUsuario[100];
+            strcpy(nomeUsuario, str1);
+            p.nomeUsuario = strdup(nomeUsuario);
+            //calculando tamanho do campo nome Usuario
+            tamNomeUsuario = strlen(p.nomeUsuario) - 1;
         }else{
             p.nomeUsuario = NULL;
             tamNomeUsuario = 0;
         }
+        //printf("tamanho usuario:%d\n",tamNomeUsuario);
+        //printf("usuario: %s\n", p.nomeUsuario);
 
     //calculando tamanho do registro;
-        int tamReg = 16 + tamNomePessoa + tamNomeUsuario;
-        p.removido = '0';//colocando como não removido
+        int tamReg = 21 + tamNomePessoa + tamNomeUsuario;
+        p.removido = '0';
     //escrevendo no arquivo binario os dados lidos
         long Offset = ftell(fdout);
         fwrite(&p.removido, sizeof(char), 1, fdout);
@@ -137,34 +107,51 @@ void CREATE_TABLE(char *arquivoEntrada, char *arquivoSaida, char *arquivoIndiceP
         fwrite(&p.idPessoa, sizeof(int), 1, fdout);
         fwrite(&p.idadePessoa, sizeof(int), 1, fdout);
         fwrite(&tamNomePessoa, sizeof(int), 1, fdout);
-        if(tamNomePessoa != 0){
+        if(p.nomePessoa != NULL){
         fwrite(p.nomePessoa, sizeof(char), tamNomePessoa, fdout);
         }
         fwrite(&tamNomeUsuario, sizeof(int), 1, fdout);
-        if(tamNomeUsuario != 0){
+        if(p.nomeUsuario != NULL){
         fwrite(p.nomeUsuario, sizeof(char), tamNomeUsuario, fdout);
-
         }
     //mais uma pessoa inserida
         hp.quantidadePessoas++;
-    //escrevendo o arquivo do indice
+    //escrevendo o arquivo do indice desordenado
         indice i;
         i.idPessoa = p.idPessoa;
         i.Offset = Offset;
-        inserirIndiceOrdenado(fdh, i);
+        fwrite(&i.idPessoa, sizeof(int), 1, fdh);
+        fwrite(&i.Offset, sizeof(long), 1, fdh);
+
     }
-
-
-
     //atualizando cabecalho do arquivo de dados binario
-    hp.Offset = ftell(fdout);
     INICIO_ARQUIVO(fdout);
     hp.status = '1'; //status consistente
     fwrite(&hp.status, sizeof(char), 1, fdout);
     fwrite(&hp.quantidadePessoas, sizeof(int), 1, fdout);
     fwrite(&hp.quantidadeRemovidos, sizeof(int), 1, fdout);
+    fseek(fdout, 0, SEEK_END);
+    hp.Offset = ftell(fdout);
+    fseek(fdout, 9, SEEK_SET);
     fwrite(&hp.Offset, sizeof(long), 1, fdout);
 
+    indice VetInd[hp.quantidadePessoas];
+            fseek(fdh, 12, SEEK_SET);
+        //puxando o indice para a RAM
+            for(int in = 0; in < hp.quantidadePessoas; in++){//copia os indices para o vetor
+                fread(&VetInd[in].idPessoa,sizeof(int),1,fdh);
+                fread(&VetInd[in].Offset,sizeof(long),1,fdh);
+            }
+
+        //ordenando o indice
+        quicksort(VetInd, 0, hp.quantidadePessoas);
+
+        //escrevendo no indice ordenado
+        fseek(fdh, 12, SEEK_SET);
+        for(int in = 0; in < hp.quantidadePessoas; in++){//copia os indices para o vetor
+                fwrite(&VetInd[in].idPessoa,sizeof(int),1,fdh);
+                fwrite(&VetInd[in].Offset,sizeof(long),1,fdh);
+            }
 
     //atualizando cabecalho do arquivo de indice
     INICIO_ARQUIVO(fdh);
