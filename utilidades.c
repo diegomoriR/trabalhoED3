@@ -227,3 +227,207 @@ void inserirIndiceOrdenado(FILE *fdh, indice novo){
     fwrite(&novo.Offset, sizeof(long), 1, fdh);
 }
 
+void lista_segue(FILE *fdin, FILE *fdh, FILE *fdo, pessoa p){
+    header h;
+    headerIndice hi;
+    headerSegue hs;
+    indice i;
+    segue *s;
+    INICIO_ARQUIVO(fdin); //coloca no começo do arquivo pessoa
+        //ler cabecalho
+        fread(&h.status, sizeof(char), 1, fdin);
+        fread(&h.quantidadePessoas, sizeof(int), 1, fdin);
+        fread(&h.quantidadeRemovidos, sizeof(int), 1, fdin);
+        INICIO_ARQUIVO(fdin); // coloca no comeco do arquivo pessoa
+
+        //printa a pessoa na tela
+        //idPessoa
+        if(p.idPessoa != -1){
+            printf("Dados da pessoa de codigo %d\n", p.idPessoa);
+        }else{
+            printf("Dados da pessoa de codigo -\n");
+        }
+        //nomePessoa
+        if(p.tamanhoNomePessoa != 0){
+            printf("Nome: %s\n", p.nomePessoa);
+        }else{
+            printf("Nome: -\n");
+        }
+        //idadePessoa
+        if(p.idadePessoa != -1){
+            printf("Idade: %d\n", p.idadePessoa);
+        }else{
+            printf("Idade: -\n");
+        }
+        //nomeUsuario
+        if(p.tamanhoNomeUsuario != 0){
+            printf("Usuario: %s\n", p.nomeUsuario);
+        }else{
+            printf("Usuario: -\n");
+        }
+        //pula linha
+        printf("\n");
+
+            INICIO_ARQUIVO(fdo);
+            fread(&hs.status, sizeof(char), 1, fdo);
+            if(hs.status == '0'){
+                fclose(fdin);
+                fclose(fdh);
+                fclose(fdo);
+                return;
+            }
+            fread(&hs.proxRRN, sizeof(int), 1, fdo);
+            fread(&hs.quantidadePessoas, sizeof(int), 1, fdo);
+
+            segue VetSegue[hs.quantidadePessoas];
+            fseek(fdo, 9, SEEK_SET);
+        //puxando o indice para a RAM
+            for(int in = 0; in < hs.quantidadePessoas; in++){//copia os indices para o vetor
+                fread(&VetSegue[in].removido,sizeof(char),1,fdo);
+                fread(&VetSegue[in].idPessoaQueSegue,sizeof(int),1,fdo);
+                fread(&VetSegue[in].idPessoaQueESeguida,sizeof(int),1,fdo);
+                VetSegue[in].dataInicioQueSegue = (char *) malloc(11);
+                fread(VetSegue[in].dataInicioQueSegue,sizeof(char),10,fdo);
+                VetSegue[in].dataInicioQueSegue[11]= '\0';
+                VetSegue[in].dataFimQueSegue = (char *) malloc(11);
+                fread(VetSegue[in].dataFimQueSegue,sizeof(char),10,fdo);
+                VetSegue[in].dataFimQueSegue[11]= '\0';
+                fread(&VetSegue[in].grauAmizade, sizeof(char), 1, fdo);
+            }
+
+            //realiza a busca binaria no segue ordenado para achar idpessoa == idpessoaQueSegue
+            s = busca_binaria(VetSegue, NUMERO_RRN, p.idPessoa);
+
+            // percorre todos os registros consecutivos com mesmo idPessoa
+            int idx = (s != NULL) ? (s - VetSegue) : -1;
+            while( (s->idPessoaQueSegue == p.idPessoa)){
+                //idSeguida
+                printf("Segue a pessoa de codigo %d\n", s->idPessoaQueESeguida);
+                //grauAmizade
+                if(s->grauAmizade == '0'){
+                    printf("Justificativa para seguir: celebridade\n");
+                }else if(s->grauAmizade == '1'){
+                    printf("Justificativa para seguir: amiga de minha amiga\n");
+                }else if(s->grauAmizade == '2'){
+                    printf("Justificativa para seguir: minha amiga\n");
+                }else if(s->grauAmizade == '$'){
+                    printf("Justificativa para seguir: -\n");
+                }
+                //dataInicio
+                printf("Comecou a seguir em: %s\n", s->dataInicioQueSegue);
+                //dataFim
+                if(strcmp(s->dataFimQueSegue, "$$$$$$$$$$") == 0){
+                    printf("Parou de seguir em: -\n");
+                }else{
+                printf("Parou de seguir em: %s\n", s->dataFimQueSegue);
+                }
+                //pula linha
+                printf("\n");
+                idx++;
+                // avança para o próximo registro consecutivo
+                if (idx < NUMERO_RRN && VetSegue[idx].idPessoaQueSegue == p.idPessoa)
+                    s = &VetSegue[idx];
+                if(VetSegue[idx].idPessoaQueSegue != p.idPessoa){
+                    break;
+                }
+            }
+
+}
+
+void remover_registro(FILE *fdin, FILE *fdh, pessoa p){
+
+    headerIndice hi;
+    header h;
+    indice i;
+
+    indice VetInd[500];
+            fseek(fdh, 12, SEEK_SET);
+        //puxando o indice para a RAM
+            for(int in = 0; in < 500; in++){//copia os indices para o vetor
+                fread(&VetInd[in].idPessoa,sizeof(int),1,fdh);
+                fread(&VetInd[in].Offset,sizeof(long),1,fdh);
+            }
+            //busca binaria no arquivo de indice para descobrir o offset para a remocao
+            //i.Offset = busca_binaria_indice(VetInd,500, p.idPessoa);
+            printf("offset %ld\n", i.Offset);
+            if(i.Offset != -1){
+                long Offset = i.Offset;
+            //remover no arquivo pessoa
+                fseek(fdin, Offset, SEEK_SET);
+                p.removido = '1';
+                fwrite(&p.removido, sizeof(char), 1, fdin);
+
+            //shift para remover da RAM
+                int pos;
+                for(int in = 0; in < 500; in++){
+                    if(VetInd[in].Offset == i.Offset)
+                    pos = in;
+                }
+                for (int j = pos; j < 500 -1; j++){
+                        VetInd[j] = VetInd[j+1];
+                }
+                h.quantidadeRemovidos++;
+            //escrever indice no disco
+            //status inconsistente
+                INICIO_ARQUIVO(fdh);
+                hi.status = '0';
+                fwrite(&hi.status, sizeof(char), 1, fdh);
+
+                fseek(fdh, 12, SEEK_SET);
+                for(int in = 0; in < 500; in++){
+                    fwrite(&VetInd[in].idPessoa,sizeof(int),1,fdh);
+                    fwrite(&VetInd[in].Offset,sizeof(long),1,fdh);
+                }
+
+            //status consistente
+                INICIO_ARQUIVO(fdh);
+                hi.status = '1';
+                fwrite(&hi.status, sizeof(char), 1, fdh);
+
+            //atualizar cabecalho
+            //status inconsistente
+                INICIO_ARQUIVO(fdin);
+                h.status = '0';
+                fwrite(&h.status, sizeof(char), 1, fdin);
+                //campo quantidade removidos
+                fseek(fdin, 5, SEEK_SET);
+                fwrite(&h.quantidadeRemovidos, sizeof(int), 1, fdin);
+                //status consistente
+                INICIO_ARQUIVO(fdin);
+                h.status = '1';
+                fwrite(&h.status, sizeof(char), 1, fdin);
+
+
+        }else{
+            printf("Registro nao encontrado.\n");
+        }
+
+}
+
+void swape(indice *a, indice *b) {
+    indice temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partitione(indice *vetor, int low, int high) {
+    indice pivot = vetor[high];
+    int i = low - 1;
+    for (int j = low; j < high; j++) {
+        if (vetor[j].idPessoa <= pivot.idPessoa) {
+            i++;
+            swape(&vetor[i], &vetor[j]);
+        }
+    }
+    swape(&vetor[i + 1], &vetor[high]);
+    return (i + 1);
+}
+
+void quicksort(indice *vetor, int low, int high) {
+    if (low < high) {
+        int pi = partitione(vetor, low, high);
+        quicksort(vetor, low, pi - 1);
+        quicksort(vetor, pi + 1, high);
+    }
+}
+
