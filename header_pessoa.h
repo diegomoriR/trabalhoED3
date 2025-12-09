@@ -44,6 +44,36 @@ typedef struct _segue{
     char grauAmizade;
 }segue;
 
+typedef struct Aresta {
+    char nomeUsuario[50];
+    char dataInicio[11];
+    char dataFim[11];
+    char grauAmizade;
+    struct Aresta *prox;
+} Aresta;
+
+typedef struct Vertice {
+    int idPessoa;
+    char nomeUsuario[50];
+    Aresta *inicioLista;
+    int cor;
+    int distancia;
+    int indicePai;
+    char dataInicio[11];
+    char dataFim[11];
+    char grauAmizade;
+} Vertice;
+
+typedef struct Node {
+    int indiceVertice;
+    struct Node *prox;
+} Node;
+
+typedef struct {
+    Node *inicio;
+    Node *fim;
+} Fila;
+
 
 #define TAMANHO_HEADER_INDICE 12
 #define INICIO_ARQUIVO(fd) fseek(fd, 0 , SEEK_SET)
@@ -62,6 +92,9 @@ void INSERT_INTO( char *arquivoPessoa, char *arquivoIndicePrimario, int NInsert)
 void UPDATE(char* arquivoEntrada, char* arquivoIndice, int n);
 void ORDER_BY(char* arquivoEntrada, char* arquivoSaida);
 void JUNCAO(char *arquivoEntrada, char *arquivoIndicePrimario, char * arquivoOrdenado, int n);
+void FUNCIONALIDADE_11(char *arquivoEntrada, char *arquivoIndicePrimario, char *arquivoOrdenado);
+void FUNCIONALIDADE_12(char *arquivoEntrada, char *arquivoIndicePrimario, char *arquivoOrdenado);
+void FUNCIONALIDADE_13(char *arquivoEntrada,char *arquivoIndicePrimario,char *arquivoOrdenado,char *nomeCelebridade);
 
 void scan_quote_string(char *str);
 void binarioNaTela(char *nomeArquivoBinario);
@@ -81,11 +114,22 @@ int busca_binaria_indice_atualiza(indice* vetor, int n, int valor);
 void busca_print(FILE *fd, FILE *fdh, int funcionalidade);
 void substitui_registro(FILE* fd, FILE* fdh,  pessoa p, long offsetP);
 void remover_registro(FILE *fdin, FILE *fdh, pessoa p);
-
+int comparar_datas(const char *data1, const char *data2);
+int comparar_vertices(const void *a, const void *b);
+void inserir_aresta_ordenada(Vertice *v, char *nomeSeguido, char *dataInicio, char *dataFim, char grau);
+int buscar_indice_por_id(Vertice *grafo, int qtd, int id);
+char* buscar_nome_por_id(Vertice *grafo, int qtd, int id);
+void inserir_aresta_transposta(Vertice *v, char *nomeSeguidor, char *dataInicio, char *dataFim, char grau);
+void inicializar_fila(Fila *f);
+void enfileirar(Fila *f, int idx);
+int desenfileirar(Fila *f);
+int fila_vazia(Fila *f);
+int buscar_indice_por_nome(Vertice *grafo, int qtd, const char* nome);
 
 
 
 #endif
+
 
 
 
