@@ -10,9 +10,12 @@ int funcionalidade, vezes;
 char arquivoEntrada[30];
 char arquivoSaida[30];
 char arquivoIndice[30];
+char arquivoOrdenado[30];
+char nomeCelebridade[50];
+char b;
 
 
-    
+
     scanf("%d", &funcionalidade);
 
     switch (funcionalidade)
@@ -66,6 +69,30 @@ char arquivoIndice[30];
         ORDER_BY(arquivoEntrada,arquivoSaida);
         break;
     case 10:
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoIndice);
+        scanf("%s", arquivoOrdenado);
+        scanf("%d", &vezes);
+        JUNCAO(arquivoEntrada, arquivoIndice, arquivoOrdenado, vezes);
+        break;
+    case 11:
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoIndice);
+        scanf("%s", arquivoOrdenado);
+        FUNCIONALIDADE_11(arquivoEntrada, arquivoIndice, arquivoOrdenado);
+        break;
+    case 12:
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoIndice);
+        scanf("%s", arquivoOrdenado);
+        FUNCIONALIDADE_12(arquivoEntrada, arquivoIndice, arquivoOrdenado);
+        break;
+    case 13:
+        scanf("%s", arquivoEntrada);
+        scanf("%s", arquivoIndice);
+        scanf("%s", arquivoOrdenado);
+        scanf("%s", nomeCelebridade);
+        FUNCIONALIDADE_13(arquivoEntrada, arquivoIndice, arquivoOrdenado, nomeCelebridade);
         break;
     default:
         break;
